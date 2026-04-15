@@ -70,7 +70,7 @@ git push origin main
 ## Contact
 
 For any queries, reach out to us at:
-- **phone number** : [7981972900]
+- **contact number** : [7981972900]
 
 ---
 
