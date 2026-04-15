@@ -1,4 +1,4 @@
-# Hackathon — [Your Org Name]
+# Hackathon — [DEV ARENA]
 
 Welcome to the official hackathon repository by [GDG,UCE-OU].
 This repository serves as the starting point for all participating teams.
