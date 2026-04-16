@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -304,7 +305,7 @@
     .pill-entertain { background: #faeeda; color: #633806; border-color: #fac775; }
 
     /* ─────────────────────────────────────
-       CHART AREA  (bar chart)
+       CHART AREA  (pie chart)
     ───────────────────────────────────── */
     .chart-area {
       margin-top: 1rem;
@@ -319,9 +320,17 @@
       justify-content: center;
       gap: 8px;
       transition: border-color 0.2s, background 0.2s;
+      position: relative; /* needed so canvas + empty state overlay correctly */
     }
 
     .chart-area:hover { background: #eef4fb; border-color: #85b7eb; }
+
+    /* The canvas is hidden by default; JS shows it when data exists */
+    #expenseChart {
+      display: none;
+      max-width: 240px;
+      max-height: 240px;
+    }
 
     /* Empty state (icon + text) */
     .chart-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -334,50 +343,6 @@
     }
 
     .chart-area span { font-size: 13px; color: #a0aeba; }
-
-    /* Live bar chart styles */
-    .bar-chart {
-      width: 100%;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 14px;
-      height: 120px;
-    }
-
-    .bar-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      flex: 1;
-    }
-
-    .bar-amount {
-      font-size: 10px;
-      font-weight: 700;
-      color: #185fa5;
-    }
-
-    .bar {
-      width: 100%;
-      max-width: 52px;
-      border-radius: 6px 6px 0 0;
-      transition: height 0.5s ease;
-      min-height: 4px;
-    }
-
-    .bar-food      { background: #3ecf93; }
-    .bar-transport { background: #378add; }
-    .bar-academics { background: #7c6df5; }
-    .bar-entertain { background: #f5a623; }
-
-    .bar-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: #6b7a90;
-      text-align: center;
-    }
 
     /* ─────────────────────────────────────
        EXPENSE HISTORY LIST
@@ -597,10 +562,15 @@
         <span class="pill pill-entertain">Entertainment</span>
       </div>
 
-      <!-- Chart area — id="chart" already in original HTML -->
+      <!-- Chart area — contains the Chart.js pie chart canvas -->
       <div class="chart-area" id="chart">
-        <!-- JS replaces this content with a live bar chart -->
-        <div class="chart-empty">
+        <!-- Canvas element that Chart.js will draw the pie chart onto -->
+        <!-- id="expenseChart" is referenced in JavaScript to initialize the chart -->
+        <canvas id="expenseChart"></canvas>
+
+        <!-- Empty state shown when there are no expenses yet -->
+        <!-- JS toggles this with display:none once data exists -->
+        <div class="chart-empty" id="chart-empty-state">
           <svg class="chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="12" width="4" height="9" rx="1"/>
             <rect x="10" y="7" width="4" height="14" rx="1"/>
@@ -632,6 +602,9 @@
 
   <!-- Toast notification (JS shows/hides this) -->
   <div class="toast" id="toast"></div>
+
+  <!-- ── Chart.js (pie chart library via CDN) ── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
   <!-- ══════════════════════════════════════════════════════════
        JAVASCRIPT  —  Student Expense Tracker
@@ -767,53 +740,142 @@
       });
     }
 
+    // ── PIE CHART  (Chart.js) ──────────────────────────────────
+
+    // The four categories our tracker supports, in a fixed order.
+    // The order here determines which color maps to which category.
+    const CHART_CATEGORIES = ["food", "transport", "academics", "entertainment"];
+
+    // Matching display labels shown in the chart legend
+    const CHART_LABELS = ["Food", "Transport", "Academics", "Entertainment"];
+
+    // One color per category — kept consistent with the rest of the UI palette
+    const CHART_COLORS = [
+      "#3ecf93",  // Food        — green  (matches .dot-food)
+      "#378add",  // Transport   — blue   (matches .dot-transport)
+      "#7c6df5",  // Academics   — purple (matches .dot-academics)
+      "#f5a623",  // Entertainment — amber (matches .dot-entertainment)
+    ];
+
+    // We keep a single Chart instance here so we can update it later.
+    // null means the chart hasn't been created yet.
+    let pieChart = null;
+
     /**
-     * Rebuild the bar chart inside #chart.
-     * Each category gets one vertical bar whose height is proportional
-     * to its share of the largest category total.
+     * getTotalsArray()
+     * Converts the { food: X, transport: Y, … } object from
+     * calculateCategoryTotals() into an ordered array that Chart.js
+     * can use directly as its `data` values.
+     *
+     * @param   {object} totalsObj  — e.g. { food: 500, transport: 200, … }
+     * @returns {number[]}          — e.g. [500, 200, 800, 150]
+     */
+    function getTotalsArray(totalsObj) {
+      // Map each category key to its total, preserving CHART_CATEGORIES order
+      return CHART_CATEGORIES.map(function(cat) {
+        return totalsObj[cat] || 0;
+      });
+    }
+
+    /**
+     * initPieChart()
+     * Creates the Chart.js pie chart for the very first time.
+     * Should only be called once — on page load — via renderChart().
+     *
+     * @param {number[]} dataValues — ordered array of category totals
+     */
+    function initPieChart(dataValues) {
+      var canvas = document.getElementById("expenseChart");
+      var ctx = canvas.getContext("2d");
+
+      pieChart = new Chart(ctx, {
+        type: "pie",
+
+        data: {
+          labels: CHART_LABELS,           // ["Food", "Transport", …]
+          datasets: [{
+            label: "Spending (₹)",
+            data: dataValues,             // [500, 200, 800, 150]
+            backgroundColor: CHART_COLORS,
+            borderColor: "#ffffff",       // white gap between slices
+            borderWidth: 2,
+            hoverOffset: 8               // slice pops out slightly on hover
+          }]
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          animation: {
+            duration: 500,              // smooth 0.5 s update animation
+            easing: "easeInOutQuart"
+          },
+          plugins: {
+            // Legend sits below the chart, one item per category
+            legend: {
+              position: "bottom",
+              labels: {
+                font: { size: 12, family: "'Segoe UI', Arial, sans-serif" },
+                color: "#1a2535",
+                padding: 14,
+                usePointStyle: true,    // circles instead of squares
+                pointStyleWidth: 8
+              }
+            },
+            // Tooltip shows the amount and the percentage share
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  var value = context.parsed;
+                  var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                  var pct   = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
+                  // e.g.  "Food  ₹500.00  (35.7%)"
+                  return "  " + formatCurrency(value) + "  (" + pct + "%)";
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    /**
+     * renderChart()
+     * Called by updateUI() after every data change.
+     * • If no expenses exist  → hides canvas, shows empty-state placeholder.
+     * • First time with data  → creates the Chart.js instance (initPieChart).
+     * • Subsequent updates    → pushes new data into the existing chart.
+     *
+     * @param {Array} expenses — the current full expenses array
      */
     function renderChart(expenses) {
-      const totals  = calculateCategoryTotals(expenses);
-      const entries = Object.entries(totals);           // [ ["food", 500], … ]
-      const maxVal  = Math.max(...entries.map(function(e) { return e[1]; }), 1);
+      var canvas     = document.getElementById("expenseChart");
+      var emptyState = document.getElementById("chart-empty-state");
+      var totalsObj  = calculateCategoryTotals(expenses);
+      var dataValues = getTotalsArray(totalsObj);
 
-      // If no expenses recorded yet, show the placeholder icon
-      const hasData = entries.some(function(e) { return e[1] > 0; });
+      // Check whether any category has a non-zero amount
+      var hasData = dataValues.some(function(v) { return v > 0; });
 
       if (!hasData) {
-        chartArea.innerHTML = `
-          <div class="chart-empty">
-            <svg class="chart-icon" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="12" width="4" height="9" rx="1"/>
-              <rect x="10" y="7" width="4" height="14" rx="1"/>
-              <rect x="17" y="3" width="4" height="18" rx="1"/>
-            </svg>
-            <span>Expense chart will appear here</span>
-          </div>`;
+        // No expenses yet — show the placeholder, hide the canvas
+        canvas.style.display     = "none";
+        emptyState.style.display = "flex";
         return;
       }
 
-      // Map each category to a <div class="bar-group"> with a proportional bar
-      const barGroupsHTML = entries.map(function(entry) {
-        const cat    = entry[0];   // "food", "transport", etc.
-        const amount = entry[1];
-        const heightPct = (amount / maxVal) * 100; // scale to tallest bar = 100 %
+      // We have data — show canvas, hide placeholder
+      canvas.style.display     = "block";
+      emptyState.style.display = "none";
 
-        // Short display label for the x-axis
-        const label = cat === "entertainment" ? "Entertain" :
-                      cat.charAt(0).toUpperCase() + cat.slice(1);
-
-        return `
-          <div class="bar-group">
-            <span class="bar-amount">${amount > 0 ? formatCurrency(amount) : ""}</span>
-            <div class="bar bar-${cat}"
-                 style="height: ${heightPct}px; max-height: 80px;"></div>
-            <span class="bar-label">${label}</span>
-          </div>`;
-      }).join("");
-
-      chartArea.innerHTML = `<div class="bar-chart">${barGroupsHTML}</div>`;
+      if (!pieChart) {
+        // First time: create the chart from scratch
+        initPieChart(dataValues);
+      } else {
+        // Already exists: just swap in the new numbers and re-render
+        pieChart.data.datasets[0].data = dataValues;
+        pieChart.update();              // Chart.js animates the transition
+      }
     }
 
     /**
