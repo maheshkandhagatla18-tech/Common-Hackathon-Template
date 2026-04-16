@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Expense Tracker</title>
+
+  <style>
+
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 16px;
+      background: #eef2f7;
+      color: #1a2535;
+      min-height: 100vh;
+      padding: 2.5rem 1rem 3rem;
+    }
+
+    /* ── Centered container ── */
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ─────────────────────────────────────
+       HEADER
+    ───────────────────────────────────── */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e6f1fb;
+      color: #0c447c;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #185fa5;
+    }
+
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #0c2d57;
+      letter-spacing: -0.3px;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #6b7a90;
+    }
+
+    /* ─────────────────────────────────────
+       CARD
+    ───────────────────────────────────── */
+    .card {
+      background: #ffffff;
+      border: 1px solid #dce6f0;
+      border-radius: 16px;
+      padding: 1.4rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: #b5d4f4;
+      box-shadow: 0 4px 16px rgba(24, 95, 165, 0.07);
+    }
+
+    .card-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #8a97aa;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 1.1rem;
+    }
+
+    .label-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .icon-blue   { background: #e6f1fb; color: #0c447c; }
+    .icon-green  { background: #eaf3de; color: #27500a; }
+    .icon-purple { background: #eeedfe; color: #3c3489; }
+
+    /* ─────────────────────────────────────
+       FORM ELEMENTS
+    ───────────────────────────────────── */
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7a90;
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      height: 40px;
+      padding: 0 13px;
+      border: 1px solid #c8d6e5;
+      border-radius: 9px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a2535;
+      background: #f4f8fc;
+      outline: none;
+      transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    }
+
+    input[type="number"]:hover,
+    select:hover { border-color: #85b7eb; }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: #378add;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.14);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* ─────────────────────────────────────
+       BUTTON
+    ───────────────────────────────────── */
+    .btn-primary {
+      height: 40px;
+      padding: 0 22px;
+      background: #185fa5;
+      color: #e6f1fb;
+      border: none;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
+    }
+
+    .btn-primary:hover {
+      background: #0c447c;
+      box-shadow: 0 3px 10px rgba(24, 95, 165, 0.22);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+      box-shadow: none;
+    }
+
+    .btn-full { width: 100%; margin-top: 6px; }
+
+    /* ─────────────────────────────────────
+       SECTION TITLE
+    ───────────────────────────────────── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8a97aa;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin: 1.6rem 0 0.75rem;
+    }
+
+    /* ─────────────────────────────────────
+       METRIC CARDS
+    ───────────────────────────────────── */
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .metric {
+      background: #f4f8fc;
+      border: 1px solid #dce6f0;
+      border-radius: 12px;
+      padding: 1rem 1.15rem;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .metric:hover {
+      background: #ffffff;
+      border-color: #b5d4f4;
+      box-shadow: 0 4px 14px rgba(24, 95, 165, 0.07);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: #6b7a90;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .metric-value.blue  { color: #185fa5; }
+    .metric-value.green { color: #3b6d11; }
+    .metric-value.red   { color: #b91c1c; } /* over-budget state */
+
+    /* ─────────────────────────────────────
+       PROGRESS BAR
+    ───────────────────────────────────── */
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #6b7a90;
+      margin-bottom: 9px;
+      font-weight: 500;
+    }
+
+    .progress-meta strong { color: #1a2535; font-weight: 700; }
+
+    .progress-track {
+      height: 9px;
+      background: #e6f1fb;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid #dce6f0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #378add;
+      border-radius: 99px;
+      transition: width 0.5s ease, background 0.3s ease;
+    }
+
+    /* Turn bar red when over budget */
+    .progress-fill.over { background: #ef4444; }
+
+    /* ─────────────────────────────────────
+       CATEGORY PILLS
+    ───────────────────────────────────── */
+    .category-pills {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #dce6f0;
+    }
+
+    .pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 11px;
+      border-radius: 99px;
+      border: 1px solid;
+      cursor: default;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+
+    .pill:hover { opacity: 0.72; transform: scale(0.97); }
+
+    .pill-food      { background: #e1f5ee; color: #085041; border-color: #9fe1cb; }
+    .pill-transport { background: #e6f1fb; color: #0c447c; border-color: #b5d4f4; }
+    .pill-academics { background: #eeedfe; color: #3c3489; border-color: #afa9ec; }
+    .pill-entertain { background: #faeeda; color: #633806; border-color: #fac775; }
+
+    /* ─────────────────────────────────────
+       CHART AREA  (bar chart)
+    ───────────────────────────────────── */
+    .chart-area {
+      margin-top: 1rem;
+      background: #f4f8fc;
+      border: 1.5px dashed #c8d6e5;
+      border-radius: 12px;
+      padding: 1rem;
+      min-height: 155px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .chart-area:hover { background: #eef4fb; border-color: #85b7eb; }
+
+    /* Empty state (icon + text) */
+    .chart-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+    .chart-icon {
+      width: 28px;
+      height: 28px;
+      opacity: 0.28;
+      color: #185fa5;
+    }
+
+    .chart-area span { font-size: 13px; color: #a0aeba; }
+
+    /* Live bar chart styles */
+    .bar-chart {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 14px;
+      height: 120px;
+    }
+
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .bar-amount {
+      font-size: 10px;
+      font-weight: 700;
+      color: #185fa5;
+    }
+
+    .bar {
+      width: 100%;
+      max-width: 52px;
+      border-radius: 6px 6px 0 0;
+      transition: height 0.5s ease;
+      min-height: 4px;
+    }
+
+    .bar-food      { background: #3ecf93; }
+    .bar-transport { background: #378add; }
+    .bar-academics { background: #7c6df5; }
+    .bar-entertain { background: #f5a623; }
+
+    .bar-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #6b7a90;
+      text-align: center;
+    }
+
+    /* ─────────────────────────────────────
+       EXPENSE HISTORY LIST
+    ───────────────────────────────────── */
+    .expense-list {
+      list-style: none;
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .expense-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f4f8fc;
+      border: 1px solid #dce6f0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 13px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+
+    .expense-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .expense-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-food      { background: #3ecf93; }
+    .dot-transport { background: #378add; }
+    .dot-academics { background: #7c6df5; }
+    .dot-entertainment { background: #f5a623; }
+
+    .expense-cat {
+      font-weight: 600;
+      color: #1a2535;
+      text-transform: capitalize;
+    }
+
+    .expense-date { color: #8a97aa; font-size: 11px; margin-left: 4px; }
+
+    .expense-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .expense-amount { font-weight: 700; color: #185fa5; }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0bec5;
+      font-size: 14px;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .delete-btn:hover { color: #ef4444; background: #fee2e2; }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: #0c2d57;
+      color: #e6f1fb;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 99px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Centered container ── -->
+  <div class="container">
+
+    <!-- ── Header ── -->
+    <div class="header">
+      <div class="header-badge">
+        <span class="badge-dot"></span>
+        Monthly tracker
+      </div>
+      <h1>Student Expense Tracker</h1>
+      <p>Stay on top of your monthly spending</p>
+    </div>
+
+    <!-- ── Set Monthly Budget ── -->
+    <div class="card">
+      <p class="card-label">
+        <span class="label-icon icon-blue">₹</span>
+        Monthly budget
+      </p>
+      <div class="row">
+        <!--
+          id="budget-input"  → JS reads the budget amount from here
+        -->
+        <input type="number" id="budget-input" placeholder="Enter budget amount (₹)" min="0" />
+        <!--
+          id="set-budget-btn" → JS attaches click listener here
+        -->
+        <button class="btn-primary" id="set-budget-btn">Set budget</button>
+      </div>
+    </div>
+
+    <!-- ── Add Expense Form ── -->
+    <div class="card">
+      <p class="card-label">
+        <span class="label-icon icon-green">+</span>
+        Add expense
+      </p>
+
+      <div class="row" style="margin-bottom: 12px;">
+
+        <!-- Amount — id="amount" already in original HTML -->
+        <div class="field">
+          <label class="field-label" for="amount">Amount (₹)</label>
+          <input type="number" id="amount" placeholder="0.00" min="0" />
+        </div>
+
+        <!-- Category — id="category" already in original HTML -->
+        <div class="field">
+          <label class="field-label" for="category">Category</label>
+          <select id="category">
+            <option value="" disabled selected>Select category</option>
+            <option value="food">Food</option>
+            <option value="transport">Transport</option>
+            <option value="academics">Academics</option>
+            <option value="entertainment">Entertainment</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!--
+        id="add-btn" → JS attaches click listener here
+      -->
+      <button class="btn-primary btn-full" id="add-btn">Add expense</button>
+    </div>
+
+    <!-- ── Dashboard ── -->
+    <p class="section-title">Dashboard</p>
+
+    <!-- Metric cards -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Total spent</div>
+        <!--
+          id="total-spent" → JS writes total amount here
+        -->
+        <div class="metric-value blue" id="total-spent">₹0</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Remaining balance</div>
+        <!--
+          id="remaining-balance" → JS writes remaining amount here
+        -->
+        <div class="metric-value green" id="remaining-balance">₹0</div>
+      </div>
+    </div>
+
+    <!-- Budget usage card -->
+    <div class="card">
+      <p class="card-label">
+        <span class="label-icon icon-purple">%</span>
+        Budget usage
+      </p>
+
+      <!-- Progress bar -->
+      <div class="progress-meta">
+        <!--
+          id="progress-text" → JS writes "₹X of ₹Y used"
+          id="progress-pct"  → JS writes the percentage
+        -->
+        <span id="progress-text">₹0 of ₹0 used</span>
+        <strong id="progress-pct">0%</strong>
+      </div>
+      <div class="progress-track">
+        <!--
+          id="progress-fill" → JS sets the width% via style
+        -->
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <!-- Category pills (static decoration) -->
+      <div class="category-pills">
+        <span class="pill pill-food">Food</span>
+        <span class="pill pill-transport">Transport</span>
+        <span class="pill pill-academics">Academics</span>
+        <span class="pill pill-entertain">Entertainment</span>
+      </div>
+
+      <!-- Chart area — id="chart" already in original HTML -->
+      <div class="chart-area" id="chart">
+        <!-- JS replaces this content with a live bar chart -->
+        <div class="chart-empty">
+          <svg class="chart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="12" width="4" height="9" rx="1"/>
+            <rect x="10" y="7" width="4" height="14" rx="1"/>
+            <rect x="17" y="3" width="4" height="18" rx="1"/>
+          </svg>
+          <span>Expense chart will appear here</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Expense History ── -->
+    <p class="section-title">Recent expenses</p>
+    <div class="card" style="padding-bottom: 1rem;">
+      <p class="card-label">
+        <span class="label-icon icon-green">↓</span>
+        Expense history
+      </p>
+      <!--
+        id="expense-list" → JS renders one <li> per expense here
+      -->
+      <ul class="expense-list" id="expense-list">
+        <li style="font-size:13px; color:#a0aeba; text-align:center; padding: 12px 0;">
+          No expenses yet. Add one above!
+        </li>
+      </ul>
+    </div>
+
+  </div><!-- end .container -->
+
+  <!-- Toast notification (JS shows/hides this) -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT  —  Student Expense Tracker
+       ══════════════════════════════════════════════════════════ -->
+  <script>
+
+    // ──────────────────────────────────────────────────────────
+    // 1.  CONSTANTS  &  DOM REFERENCES
+    // ──────────────────────────────────────────────────────────
+
+    // Keys used to store data in localStorage
+    const STORAGE_KEY_EXPENSES = "set_expenses";
+    const STORAGE_KEY_BUDGET   = "set_budget";
+
+    // Default budget shown until the user sets one
+    const DEFAULT_BUDGET = 0;
+
+    // Grab every element we need to read from or write to
+    const amountInput     = document.getElementById("amount");           // expense amount field
+    const categorySelect  = document.getElementById("category");         // category dropdown
+    const addBtn          = document.getElementById("add-btn");          // "Add expense" button
+
+    const budgetInput     = document.getElementById("budget-input");     // budget amount field
+    const setBudgetBtn    = document.getElementById("set-budget-btn");   // "Set budget" button
+
+    const totalSpentEl    = document.getElementById("total-spent");      // metric: total spent
+    const remainingEl     = document.getElementById("remaining-balance");// metric: remaining
+
+    const progressText    = document.getElementById("progress-text");    // "₹X of ₹Y used"
+    const progressPct     = document.getElementById("progress-pct");     // "35%"
+    const progressFill    = document.getElementById("progress-fill");    // the coloured bar
+
+    const chartArea       = document.getElementById("chart");            // bar chart container
+    const expenseList     = document.getElementById("expense-list");     // history <ul>
+    const toastEl         = document.getElementById("toast");            // bottom toast
+
+    // ──────────────────────────────────────────────────────────
+    // 2.  LOCAL-STORAGE HELPERS
+    // ──────────────────────────────────────────────────────────
+
+    /** Read the expenses array from localStorage (returns [] if none saved). */
+    function loadExpenses() {
+      const raw = localStorage.getItem(STORAGE_KEY_EXPENSES);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    /** Write the expenses array back to localStorage. */
+    function saveExpenses(expenses) {
+      localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(expenses));
+    }
+
+    /** Read the saved budget number (returns DEFAULT_BUDGET if not set). */
+    function loadBudget() {
+      const raw = localStorage.getItem(STORAGE_KEY_BUDGET);
+      return raw ? parseFloat(raw) : DEFAULT_BUDGET;
+    }
+
+    /** Write the budget number to localStorage. */
+    function saveBudget(amount) {
+      localStorage.setItem(STORAGE_KEY_BUDGET, amount.toString());
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 3.  CORE CALCULATIONS
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Add all expense amounts together.
+     * @returns {number} — the running total
+     */
+    function calculateTotalSpent(expenses) {
+      // reduce() loops through the array and accumulates a sum
+      return expenses.reduce(function(sum, exp) {
+        return sum + exp.amount;
+      }, 0);
+    }
+
+    /**
+     * How much money is left?
+     * @returns {number} — budget minus total spent (can be negative)
+     */
+    function calculateRemainingBalance(totalSpent, budget) {
+      return budget - totalSpent;
+    }
+
+    /**
+     * How much of the budget has been used, as a percentage?
+     * Capped at 100 for display (bar can't overflow the track).
+     * @returns {number} — e.g. 35 means 35 %
+     */
+    function calculatePercentageUsed(totalSpent, budget) {
+      if (budget <= 0) return 0;             // avoid divide-by-zero
+      const pct = (totalSpent / budget) * 100;
+      return Math.min(pct, 100);             // cap at 100 %
+    }
+
+    /**
+     * Sum expenses per category (for the bar chart).
+     * @returns {object} — e.g. { food: 500, transport: 200, … }
+     */
+    function calculateCategoryTotals(expenses) {
+      const totals = { food: 0, transport: 0, academics: 0, entertainment: 0 };
+      expenses.forEach(function(exp) {
+        if (totals[exp.category] !== undefined) {
+          totals[exp.category] += exp.amount;
+        }
+      });
+      return totals;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 4.  TOAST  (quick feedback message)
+    // ──────────────────────────────────────────────────────────
+
+    /** Show a short message at the bottom of the screen for ~2 s. */
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      setTimeout(function() {
+        toastEl.classList.remove("show");
+      }, 2000);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 5.  UI RENDERING
+    // ──────────────────────────────────────────────────────────
+
+    /** Format a number as "₹1,234.50" */
+    function formatCurrency(amount) {
+      return "₹" + amount.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    /**
+     * Rebuild the bar chart inside #chart.
+     * Each category gets one vertical bar whose height is proportional
+     * to its share of the largest category total.
+     */
+    function renderChart(expenses) {
+      const totals  = calculateCategoryTotals(expenses);
+      const entries = Object.entries(totals);           // [ ["food", 500], … ]
+      const maxVal  = Math.max(...entries.map(function(e) { return e[1]; }), 1);
+
+      // If no expenses recorded yet, show the placeholder icon
+      const hasData = entries.some(function(e) { return e[1] > 0; });
+
+      if (!hasData) {
+        chartArea.innerHTML = `
+          <div class="chart-empty">
+            <svg class="chart-icon" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="12" width="4" height="9" rx="1"/>
+              <rect x="10" y="7" width="4" height="14" rx="1"/>
+              <rect x="17" y="3" width="4" height="18" rx="1"/>
+            </svg>
+            <span>Expense chart will appear here</span>
+          </div>`;
+        return;
+      }
+
+      // Map each category to a <div class="bar-group"> with a proportional bar
+      const barGroupsHTML = entries.map(function(entry) {
+        const cat    = entry[0];   // "food", "transport", etc.
+        const amount = entry[1];
+        const heightPct = (amount / maxVal) * 100; // scale to tallest bar = 100 %
+
+        // Short display label for the x-axis
+        const label = cat === "entertainment" ? "Entertain" :
+                      cat.charAt(0).toUpperCase() + cat.slice(1);
+
+        return `
+          <div class="bar-group">
+            <span class="bar-amount">${amount > 0 ? formatCurrency(amount) : ""}</span>
+            <div class="bar bar-${cat}"
+                 style="height: ${heightPct}px; max-height: 80px;"></div>
+            <span class="bar-label">${label}</span>
+          </div>`;
+      }).join("");
+
+      chartArea.innerHTML = `<div class="bar-chart">${barGroupsHTML}</div>`;
+    }
+
+    /**
+     * Rebuild the expense history list inside #expense-list.
+     * Most recent expense is shown first.
+     */
+    function renderExpenseList(expenses) {
+      if (expenses.length === 0) {
+        expenseList.innerHTML = `
+          <li style="font-size:13px; color:#a0aeba; text-align:center; padding:12px 0;">
+            No expenses yet. Add one above!
+          </li>`;
+        return;
+      }
+
+      // Show newest first by reversing a copy of the array
+      const reversed = expenses.slice().reverse();
+
+      expenseList.innerHTML = reversed.map(function(exp) {
+        return `
+          <li class="expense-item">
+            <div class="expense-item-left">
+              <span class="expense-dot dot-${exp.category}"></span>
+              <span class="expense-cat">${exp.category}</span>
+              <span class="expense-date">${exp.date}</span>
+            </div>
+            <div class="expense-right">
+              <span class="expense-amount">${formatCurrency(exp.amount)}</span>
+              <button class="delete-btn" data-id="${exp.id}"
+                      title="Delete expense">✕</button>
+            </div>
+          </li>`;
+      }).join("");
+
+      // Wire up each delete button after injecting HTML
+      expenseList.querySelectorAll(".delete-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          const id = parseInt(btn.getAttribute("data-id"));
+          deleteExpense(id);
+        });
+      });
+    }
+
+    /**
+     * Master refresh — call this after ANY data change.
+     * Reads from localStorage and updates every part of the UI.
+     */
+    function updateUI() {
+      const expenses  = loadExpenses();
+      const budget    = loadBudget();
+      const total     = calculateTotalSpent(expenses);
+      const remaining = calculateRemainingBalance(total, budget);
+      const pct       = calculatePercentageUsed(total, budget);
+
+      // -- Metric cards --
+      totalSpentEl.textContent = formatCurrency(total);
+
+      remainingEl.textContent = formatCurrency(remaining);
+      // Turn remaining balance red when over budget
+      remainingEl.className = "metric-value " + (remaining < 0 ? "red" : "green");
+
+      // -- Progress bar --
+      progressText.textContent  = formatCurrency(total) + " of " +
+                                  formatCurrency(budget) + " used";
+      progressPct.textContent   = Math.round(pct) + "%";
+      progressFill.style.width  = pct + "%";
+      // Red bar when over budget
+      if (pct >= 100) {
+        progressFill.classList.add("over");
+      } else {
+        progressFill.classList.remove("over");
+      }
+
+      // -- Budget input placeholder shows current budget --
+      budgetInput.placeholder = "Current: " + formatCurrency(budget);
+
+      // -- Chart --
+      renderChart(expenses);
+
+      // -- Expense history list --
+      renderExpenseList(expenses);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 6.  ACTIONS
+    // ──────────────────────────────────────────────────────────
+
+    /**
+     * Create a new expense object and save it.
+     * Called when the user clicks "Add expense".
+     */
+    function addExpense() {
+      const amount   = parseFloat(amountInput.value);
+      const category = categorySelect.value;
+
+      // Validate — amount must be a positive number
+      if (!amount || isNaN(amount) || amount <= 0) {
+        showToast("⚠ Please enter a valid amount.");
+        return;
+      }
+
+      // Validate — a category must be chosen
+      if (!category) {
+        showToast("⚠ Please select a category.");
+        return;
+      }
+
+      // Build the expense record
+      const newExpense = {
+        id:       Date.now(),                       // unique timestamp-based ID
+        amount:   amount,
+        category: category,
+        date:     new Date().toLocaleDateString("en-IN")  // e.g. "16/04/2026"
+      };
+
+      // Load existing list, push the new entry, save back
+      const expenses = loadExpenses();
+      expenses.push(newExpense);
+      saveExpenses(expenses);
+
+      // Clear the form inputs so user can add the next expense quickly
+      amountInput.value    = "";
+      categorySelect.value = "";
+
+      // Refresh everything on screen
+      updateUI();
+      showToast("✓ Expense added!");
+    }
+
+    /**
+     * Remove an expense by its unique ID.
+     * @param {number} id — the expense's Date.now() ID
+     */
+    function deleteExpense(id) {
+      const expenses = loadExpenses().filter(function(exp) {
+        return exp.id !== id;    // keep every expense EXCEPT the deleted one
+      });
+      saveExpenses(expenses);
+      updateUI();
+      showToast("Expense removed.");
+    }
+
+    /**
+     * Save a new monthly budget from the budget input field.
+     * Called when the user clicks "Set budget".
+     */
+    function setBudget() {
+      const amount = parseFloat(budgetInput.value);
+
+      if (!amount || isNaN(amount) || amount <= 0) {
+        showToast("⚠ Please enter a valid budget.");
+        return;
+      }
+
+      saveBudget(amount);
+      budgetInput.value = "";           // clear field after saving
+      updateUI();
+      showToast("✓ Budget set to " + formatCurrency(amount));
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // 7.  EVENT LISTENERS
+    // ──────────────────────────────────────────────────────────
+
+    // "Add expense" button click
+    addBtn.addEventListener("click", addExpense);
+
+    // Allow pressing Enter in the amount field as a shortcut
+    amountInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") addExpense();
+    });
+
+    // "Set budget" button click
+    setBudgetBtn.addEventListener("click", setBudget);
+
+    // ──────────────────────────────────────────────────────────
+    // 8.  INITIALISE ON PAGE LOAD
+    // ──────────────────────────────────────────────────────────
+
+    // Run updateUI() immediately so any previously saved data is shown
+    updateUI();
+
+  </script>
+
+</body>
+</html>
