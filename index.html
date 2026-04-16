@@ -1,35 +1,35 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Expense Tracker</title>
-
-  <!-- ✅ Chart.js via CDN — no installation needed -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <!-- Change 9: Professional font without slashed zeros -->
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-    /* ── CSS Variables ───────────────────────── */
     :root {
-      --bg:         #ffffff;
-      --surface:    #f8fafc;
-      --surface2:   #f1f5f9;
-      --border:     #e2e8f0;
-      --border-med: #cbd5e1;
-      --text:       #0f172a;
-      --muted:      #64748b;
-      --food:       #dc2626;
-      --transport:  #d97706;
-      --academics:  #0891b2;
-      --entertain:  #7c3aed;
-      --accent:     #1d4ed8;
-      --accent-light: #eff6ff;
-      --danger:     #dc2626;
-      --success:    #15803d;
+      --bg:          #f5f6fa;
+      --surface:     #ffffff;
+      --surface2:    #f0f2f8;
+      --border:      #e4e7f0;
+      --border-med:  #c8cde0;
+      --text:        #111827;
+      --muted:       #6b7280;
+      --food:        #ef4444;
+      --transport:   #f59e0b;
+      --academics:   #06b6d4;
+      --entertain:   #8b5cf6;
+      --social:      #ec4899;
+      --other:       #64748b;
+      --accent:      #2563eb;
+      --accent-light:#eff6ff;
+      --danger:      #dc2626;
+      --warn:        #d97706;
+      --success:     #16a34a;
+      --radius:      12px;
+      --shadow:      0 1px 3px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,957 +37,1291 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
-      padding: 0 0 4rem;
+      padding-bottom: 5rem;
     }
 
-    /* ── Top Nav Bar ─────────────────────────── */
+    /* ── TOPBAR ── */
+    /* Change 5: Professional header – no duplicate title */
     .topbar {
-      background: #ffffff;
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 0 2rem;
+      padding: 0 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 56px;
+      height: 58px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
+      box-shadow: var(--shadow);
     }
-    .topbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
+    .topbar-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .topbar-logo {
-      width: 28px;
-      height: 28px;
-      background: var(--accent);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 0.75rem;
-      font-weight: 700;
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 0.7rem; font-weight: 700; letter-spacing: .02em;
       flex-shrink: 0;
     }
-    .topbar-right {
-      font-size: 0.78rem;
-      color: var(--muted);
-      font-weight: 500;
+    .topbar-name { font-weight: 700; font-size: .95rem; color: var(--text); letter-spacing: -.01em; }
+    .topbar-pill {
+      font-size: .68rem; font-weight: 600; color: var(--accent);
+      background: var(--accent-light); border-radius: 20px;
+      padding: 2px 9px; letter-spacing: .04em; text-transform: uppercase;
     }
+    .topbar-right { font-size: .75rem; color: var(--muted); font-weight: 500; display: flex; align-items: center; gap: .5rem; }
 
-    /* ── Page content wrapper ────────────────── */
-    .page-body {
-      padding: 2rem 1rem 1rem;
-    }
+    /* ── PAGE WRAPPER ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem; }
 
-    /* ── Header ─────────────────────────────── */
-    header {
-      text-align: left;
-      margin-bottom: 1.75rem;
-      max-width: 980px;
-      margin-left: auto;
-      margin-right: auto;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .header-eyebrow {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--accent);
-      margin-bottom: 0.4rem;
-    }
-    header h1 {
-      font-size: clamp(1.4rem, 3vw, 1.9rem);
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      color: var(--text);
-    }
-    header p {
-      color: var(--muted);
-      font-size: 0.875rem;
-      margin-top: 0.3rem;
-      font-weight: 400;
-    }
+    /* ── SECTION HEADER (simplified – no repeat of title) ── */
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header p { color: var(--muted); font-size: .85rem; }
 
-    /* ── Stats Bar ───────────────────────────── */
+    /* ── TABS ── */
+    .tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; overflow-x: auto; }
+    .tab-btn {
+      padding: .55rem 1rem;
+      border: none; background: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .82rem; font-weight: 600;
+      color: var(--muted); cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .18s, border-color .18s;
+      white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── STATS BAR ── */
+    /* Change 1: Only 3 stat cards (removed Monthly Budget) */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      max-width: 980px;
-      margin: 0 auto 1.25rem;
+      gap: .9rem;
+      margin-bottom: 1.25rem;
     }
+    @media(max-width: 700px) { .stats-bar { grid-template-columns: 1fr 1fr; } }
+    @media(max-width: 440px) { .stats-bar { grid-template-columns: 1fr; } }
+
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: var(--radius);
       padding: 1rem 1.2rem;
-      text-align: left;
-      transition: border-color 0.2s;
+      box-shadow: var(--shadow);
+      transition: border-color .2s;
     }
     .stat-card:hover { border-color: var(--border-med); }
-    .stat-card .stat-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 0.5rem;
-    }
-    .stat-card .stat-value {
-      font-size: 1.35rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    #statBudget   { color: var(--accent); }
-    #statSpent    { color: var(--food); }
-    #statBalance  { color: var(--success); }
+    .stat-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .45rem; }
+    /* Change 9: IBM Plex Mono – no slashed zeros */
+    .stat-value { font-size: 1.4rem; font-weight: 700; letter-spacing: -.01em; font-family: 'IBM Plex Mono', monospace; }
+    .stat-sub   { font-size: .72rem; color: var(--muted); margin-top: .2rem; }
+    .c-spent    { color: var(--danger); }
+    .c-balance  { color: var(--success); }
+    .c-bank     { color: var(--entertain); }
 
-    /* ── Main Layout ─────────────────────────── */
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.25rem;
-      max-width: 980px;
-      margin: 0 auto;
-    }
-    @media (max-width: 680px) {
-      .layout { grid-template-columns: 1fr; }
-      .stats-bar { grid-template-columns: 1fr; }
-    }
-
-    /* ── Cards ───────────────────────────────── */
-    .card {
-      background: #ffffff;
+    /* ── PREDICTION BANNER ── */
+    .pred-wrap { margin-bottom: 1.25rem; }
+    #prediction {
+      background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.4rem 1.5rem;
-      transition: border-color 0.2s;
+      border-radius: var(--radius);
+      padding: .9rem 1.2rem;
+      display: flex; align-items: center; gap: .9rem;
+      font-size: .88rem;
+      box-shadow: var(--shadow);
+      transition: all .3s;
     }
-    .card:hover { border-color: var(--border-med); }
-    .card h2 {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--muted);
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.75rem;
+    .pred-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .pred-text { flex: 1; }
+    .pred-text strong { display: block; font-size: .92rem; margin-bottom: .1rem; }
+    .pred-meta { font-size: .72rem; color: var(--muted); }
+    #prediction.state-safe   { border-color: #86efac; background: #f0fdf4; }
+    #prediction.state-safe   .pred-text strong { color: var(--success); }
+    #prediction.state-warn   { border-color: #fcd34d; background: #fffbeb; }
+    #prediction.state-warn   .pred-text strong { color: var(--warn); }
+    #prediction.state-danger { border-color: #fca5a5; background: #fef2f2; }
+    #prediction.state-danger .pred-text strong { color: var(--danger); }
+    #prediction.state-empty  { border-color: var(--border); }
+    #prediction.state-empty  .pred-text strong { color: var(--muted); }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .09em;
+      color: var(--muted); margin-bottom: 1.1rem;
+      padding-bottom: .75rem;
       border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* ── Form Controls ───────────────────────── */
-    label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.35rem;
-      letter-spacing: 0;
+    /* ── GRID LAYOUTS ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.1rem; }
+    .span-2 { grid-column: 1 / -1; }
+    @media(max-width: 700px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
     }
-    input, select {
+
+    /* ── FORM CONTROLS ── */
+    .form-row { margin-bottom: .85rem; }
+    label { display: block; font-size: .75rem; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
+    input, select, textarea {
       width: 100%;
-      background: #ffffff;
+      background: #fff;
       border: 1px solid var(--border-med);
-      border-radius: 7px;
+      border-radius: 8px;
       color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
-      padding: 0.6rem 0.85rem;
-      margin-bottom: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .88rem;
+      padding: .58rem .85rem;
       outline: none;
-      transition: border-color 0.18s, box-shadow 0.18s;
+      transition: border-color .18s, box-shadow .18s;
       -webkit-appearance: none;
     }
     input::placeholder { color: #94a3b8; }
-    input:hover, select:hover { border-color: #94a3b8; }
-    input:focus, select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
-    }
-    select option { background: #ffffff; color: var(--text); }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
 
-    /* Budget row — two inputs side by side */
-    .budget-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 0.6rem;
-      align-items: end;
-      margin-bottom: 1rem;
-    }
-    .budget-row input  { margin-bottom: 0; }
-    .budget-row button {
-      padding: 0.6rem 1rem;
-      background: var(--surface2);
-      border: 1px solid var(--border-med);
-      border-radius: 7px;
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background 0.18s, border-color 0.18s;
-    }
-    .budget-row button:hover { background: var(--border); border-color: #94a3b8; }
+    .inline-row { display: grid; grid-template-columns: 1fr auto; gap: .6rem; align-items: end; }
+    .inline-row input { margin-bottom: 0; }
 
-    /* Primary add button */
-    button#addBtn {
-      width: 100%;
-      padding: 0.72rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 7px;
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      padding: .6rem 1.1rem;
+      border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: all .18s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #fff; width: 100%; padding: .7rem; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 3px 10px rgba(37,99,235,.25); transform: translateY(-1px); }
+    .btn-secondary { background: var(--surface2); border: 1px solid var(--border-med); color: var(--text); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-success { background: #dcfce7; border: 1px solid #86efac; color: var(--success); }
+    .btn-success:hover { background: #bbf7d0; }
+    .btn-danger { background: none; border: 1px solid #fca5a5; color: var(--danger); font-size: .72rem; padding: .28rem .7rem; }
+    .btn-danger:hover { background: #fef2f2; }
+    .btn-ghost { background: none; border: none; color: var(--muted); padding: .25rem .5rem; font-size: .8rem; }
+    .btn-ghost:hover { color: var(--danger); }
+    .btn-sm { font-size: .72rem; padding: .3rem .65rem; }
+    .btn-wallet { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; font-size: .78rem; padding: .38rem .85rem; border-radius: 6px; }
+    .btn-add-funds { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); color: #fff; font-size: .75rem; padding: .35rem .8rem; border-radius: 6px; }
+    .btn-add-funds:hover { background: rgba(255,255,255,.28); }
+
+    /* ── WALLET CARD ── */
+    .wallet-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%);
+      border-radius: 14px;
+      padding: 1.4rem 1.6rem;
       color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 0.18s, transform 0.1s, box-shadow 0.18s;
-      letter-spacing: -0.01em;
-    }
-    button#addBtn:hover  { background: #1e40af; box-shadow: 0 3px 10px rgba(29,78,216,0.22); transform: translateY(-1px); }
-    button#addBtn:active { transform: translateY(0); box-shadow: none; }
-
-    /* ── Chart area ───────────────────────────── */
-    .chart-wrap {
       position: relative;
-      height: 240px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
+      min-height: 140px;
     }
-    #noDataMsg {
-      position: absolute;
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      pointer-events: none;
+    .wallet-card::before {
+      content: '';
+      position: absolute; top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.07);
     }
+    .wallet-card::after {
+      content: '';
+      position: absolute; bottom: -20px; right: 40px;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.05);
+    }
+    .wallet-bank { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; opacity: .7; margin-bottom: .5rem; }
+    .wallet-acct { font-family: 'IBM Plex Mono', monospace; font-size: .88rem; opacity: .85; letter-spacing: .12em; margin-bottom: 1rem; }
+    .wallet-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; opacity: .65; margin-bottom: .25rem; }
+    .wallet-balance { font-family: 'IBM Plex Mono', monospace; font-size: 2rem; font-weight: 700; letter-spacing: -.02em; }
+    .wallet-actions { position: absolute; top: 1.2rem; right: 1.2rem; z-index: 1; display: flex; gap: .45rem; flex-direction: column; align-items: flex-end; }
 
-    /* ── Custom legend ────────────────────────── */
-    .legend {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.55rem;
-      margin-top: 1.2rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
+    /* ── CATEGORY SECTIONS ── */
+    .cat-section { margin-bottom: 1.2rem; }
+    .cat-section-header {
+      display: flex; align-items: center; gap: .6rem;
+      font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--muted); margin-bottom: .6rem;
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-    }
-    .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .legend-item .cat { color: var(--text); font-weight: 500; }
-    .legend-item .amt { color: var(--muted); font-size: 0.75rem; margin-left: auto; font-weight: 600; }
+    .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-    /* ── Expense Log ──────────────────────────── */
-    .log { grid-column: 1 / -1; }
+    .cat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: .8rem 1rem;
+      margin-bottom: .45rem;
+      transition: border-color .18s;
+    }
+    .cat-card:hover { border-color: var(--border-med); }
+    .cat-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: .45rem; }
+    .cat-name { font-weight: 600; font-size: .88rem; display: flex; align-items: center; gap: .4rem; }
+    .cat-meta { text-align: right; }
+    .cat-total { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: .95rem; }
+    .cat-count { font-size: .7rem; color: var(--muted); margin-top: .1rem; }
 
-    .log-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-    .log-header h2 { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-    .clear-btn {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--danger);
-      background: none;
-      border: 1px solid #fca5a5;
-      border-radius: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: background 0.18s;
-    }
-    .clear-btn:hover { background: #fef2f2; }
+    /* Progress bar */
+    .progress-wrap { margin-bottom: .45rem; }
+    .progress-track { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width .4s ease; }
 
-    .log-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-      max-height: 240px;
-      overflow-y: auto;
-      padding-right: 4px;
+    /* Recent transactions inside cat card */
+    .cat-recent { border-top: 1px solid var(--border); padding-top: .45rem; display: flex; flex-direction: column; gap: .25rem; }
+    .mini-tx { display: flex; justify-content: space-between; align-items: center; font-size: .75rem; color: var(--muted); }
+    .mini-tx-desc { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-tx-amt { font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--text); flex-shrink: 0; margin-left: .5rem; }
+    .mini-tx-date { font-size: .68rem; color: var(--muted); opacity: .7; margin-left: .4rem; flex-shrink: 0; }
+
+    /* ── CHARTS ── */
+    .chart-container { position: relative; height: 300px; }
+    .chart-no-data { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .82rem; }
+
+    /* Chart tabs */
+    .chart-tabs { display: flex; gap: .3rem; }
+    .chart-tab {
+      padding: .28rem .7rem; border-radius: 6px; border: 1px solid var(--border);
+      font-size: .72rem; font-weight: 600; cursor: pointer;
+      background: none; font-family: 'DM Sans', sans-serif; color: var(--muted);
+      transition: all .18s;
     }
+    .chart-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Legend */
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: 1rem; padding-top: .85rem; border-top: 1px solid var(--border); }
+    .legend-item { display: flex; align-items: center; gap: .45rem; font-size: .78rem; }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .legend-cat { color: var(--text); font-weight: 500; flex: 1; }
+    .legend-amt { font-family: 'IBM Plex Mono', monospace; font-size: .75rem; font-weight: 600; color: var(--muted); }
+
+    /* ── TRANSACTION LOG ── */
+    .log-controls { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; margin-bottom: .9rem; }
+    .log-controls input[type="date"] { width: auto; flex: 1; min-width: 120px; margin-bottom: 0; }
+    .log-filter-sep { color: var(--muted); font-size: .78rem; }
+
+    .log-list { list-style: none; display: flex; flex-direction: column; gap: .4rem; max-height: 380px; overflow-y: auto; padding-right: 4px; }
     .log-list::-webkit-scrollbar { width: 4px; }
     .log-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+    /* Change 2: log-item grid updated for credit/debit coloring */
     .log-item {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr auto auto auto;
       align-items: center;
-      gap: 0.6rem;
-      background: var(--surface);
+      gap: .6rem;
+      background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 0.52rem 0.85rem;
-      font-size: 0.85rem;
-      animation: slideIn 0.25s ease;
-      transition: border-color 0.18s;
+      border-radius: 8px;
+      padding: .5rem .85rem;
+      font-size: .83rem;
+      animation: slideIn .22s ease;
+      transition: border-color .18s;
     }
+    .log-item.log-credit { border-left: 3px solid var(--success); background: #f0fdf4; }
+    .log-item.log-debit  { border-left: 3px solid transparent; }
     .log-item:hover { border-color: var(--border-med); }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .log-item .tag {
-      font-size: 0.68rem;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      flex-shrink: 0;
-    }
-    .log-item .log-desc { flex: 1; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
-    .log-item .log-amt  { font-size: 0.88rem; font-weight: 700; color: var(--text); flex-shrink: 0; }
-    .log-item .del-btn  {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 1rem;
-      line-height: 1;
-      padding: 0 2px;
-      flex-shrink: 0;
-      transition: color 0.15s;
-    }
-    .log-item .del-btn:hover { color: var(--danger); }
+    @keyframes slideIn { from { opacity:0; transform: translateY(-5px); } to { opacity:1; transform:none; } }
 
-    /* Category tag colour helpers */
+    .log-tag { font-size: .65rem; padding: 2px 7px; border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    .log-desc { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+    .log-date { font-size: .68rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+    .log-amt  { font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: .85rem; white-space: nowrap; }
+    .log-amt.amt-credit { color: var(--success); }
+    .log-amt.amt-debit  { color: var(--danger); }
+    .log-del  { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; padding: 0 2px; transition: color .15s; }
+    .log-del:hover { color: var(--danger); }
+    .empty-log { color: var(--muted); font-size: .82rem; text-align: center; padding: 2rem; }
+
+    /* Category tag colours */
     .tag-Food          { background: #fef2f2; color: #b91c1c; }
     .tag-Transport     { background: #fffbeb; color: #b45309; }
     .tag-Academics     { background: #ecfeff; color: #0e7490; }
     .tag-Entertainment { background: #f5f3ff; color: #6d28d9; }
+    .tag-Social        { background: #fdf2f8; color: #be185d; }
+    .tag-Other         { background: #f8fafc; color: #475569; }
+    .tag-Credit        { background: #f0fdf4; color: #15803d; }
 
-    .empty-log {
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      padding: 2rem 0;
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 500;
+      align-items: center; justify-content: center;
     }
-
-    /* ── Prediction Banner ───────────────────────── */
-    .prediction-wrap {
-      max-width: 980px;
-      margin: 0 auto 1.25rem;
-    }
-    #prediction {
+    .modal-overlay.open { display: flex; }
+    .modal {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 0.9rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.88rem;
-      transition: border-color 0.3s, background 0.3s;
+      border-radius: var(--radius);
+      padding: 1.6rem;
+      width: min(440px, 94vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      animation: modalIn .2s ease;
     }
-    #prediction .pred-icon {
-      font-size: 1.2rem;
-      flex-shrink: 0;
-      line-height: 1;
+    @keyframes modalIn { from { opacity:0; transform: scale(.95); } to { opacity:1; transform:none; } }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.1rem; }
+    .modal-actions { display: flex; gap: .6rem; justify-content: flex-end; margin-top: 1rem; }
+    .modal-divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+    /* ── FAB ── */
+    .fab {
+      position: fixed; bottom: 1.75rem; right: 1.75rem;
+      width: 52px; height: 52px;
+      background: var(--accent);
+      border-radius: 50%; border: none;
+      color: #fff; font-size: 1.5rem; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(37,99,235,.4);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .18s, box-shadow .18s;
+      z-index: 300;
     }
-    #prediction .pred-text {
-      flex: 1;
-      color: var(--muted);
+    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(37,99,235,.5); }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width: 680px) {
+      .page { padding: 1rem .75rem; }
+      .log-item { grid-template-columns: auto 1fr auto auto; }
+      .log-date { display: none; }
     }
-    #prediction .pred-text strong {
-      font-size: 0.95rem;
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      display: block;
-      margin-bottom: 0.15rem;
-    }
-    #prediction .pred-meta {
-      font-size: 0.72rem;
-      color: var(--muted);
-      opacity: 0.8;
-    }
-    /* State-based colours */
-    #prediction.state-safe   { border-color: #6ee7b7; background: #f0fdf4; }
-    #prediction.state-safe   .pred-text strong { color: #15803d; }
-    #prediction.state-warn   { border-color: #fcd34d; background: #fffbeb; }
-    #prediction.state-warn   .pred-text strong { color: #b45309; }
-    #prediction.state-danger { border-color: #fca5a5; background: #fef2f2; }
-    #prediction.state-danger .pred-text strong { color: #b91c1c; }
-    #prediction.state-empty  { border-color: var(--border); }
-    #prediction.state-empty  .pred-text strong { color: var(--muted); }
+
+    /* Budget progress bars per category in overview */
+    .budget-bars { display: flex; flex-direction: column; gap: .6rem; margin-top: .5rem; }
+    .bbar-row { display: flex; flex-direction: column; gap: .25rem; }
+    .bbar-header { display: flex; justify-content: space-between; align-items: center; font-size: .75rem; }
+    .bbar-name { font-weight: 600; display: flex; align-items: center; gap: .4rem; }
+    .bbar-vals { color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: .72rem; }
   </style>
 </head>
 <body>
 
-<!-- ── Top navigation bar ── -->
+<!-- ── TOPBAR (Change 5: Single professional header) ── -->
 <nav class="topbar">
   <div class="topbar-brand">
     <div class="topbar-logo">SE</div>
-    Student Expense Tracker
+    <span class="topbar-name">Student Expense Tracker</span>
+   
   </div>
-  <div class="topbar-right">Personal Finance Tool</div>
+  <div class="topbar-right">
+    <span>Personal Finance Tool</span>
+  </div>
 </nav>
 
-<div class="page-body">
+<div class="page">
 
-<header>
-  <div class="header-eyebrow">Dashboard</div>
-  <h1>Student Expense Tracker</h1>
-  <p>Monitor spending, set budgets, and stay financially on track.</p>
-</header>
+  <!-- ── HEADER (Change 5: Subtitle only, no duplicate title) ── -->
+  <div class="page-header">
+    <p>Monitor spending, track transactions, and stay financially on track.</p>
+  </div>
 
-<!-- ── Stats Bar ── -->
-<div class="stats-bar">
-  <div class="stat-card">
-    <div class="stat-label">Monthly Budget</div>
-    <div class="stat-value" id="statBudget">₹0.00</div>
+  <!-- ── STATS BAR (Change 1: Removed Monthly Budget card) ── -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-label">Total Spent</div>
+      <div class="stat-value c-spent" id="statSpent">₹0.00</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Remaining (vs Wallet)</div>
+      <div class="stat-value c-balance" id="statBalance">—</div>
+    </div>
+    <div class="stat-card" id="walletStatCard" style="cursor:pointer" onclick="openWalletModal()">
+      <div class="stat-label">Wallet Balance</div>
+      <div class="stat-value c-bank" id="statWallet">—</div>
+      <div class="stat-sub" id="statWalletAcct">Click to setup</div>
+    </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Total Spent</div>
-    <div class="stat-value" id="statSpent">₹0.00</div>
+
+  <!-- ── PREDICTION BANNER ── -->
+  <div class="pred-wrap">
+    <div id="prediction" class="state-empty">
+      <span class="pred-icon">🔮</span>
+      <div class="pred-text">
+        <strong>No data available</strong>
+        <span class="pred-meta">Add expenses to see your spending forecast</span>
+      </div>
+    </div>
   </div>
-  <div class="stat-card">
-    <div class="stat-label">Remaining</div>
-    <div class="stat-value" id="statBalance">₹0.00</div>
+
+  <!-- ── TABS ── -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="overview">Overview</button>
+    <button class="tab-btn" data-tab="categories">Categories</button>
+    <button class="tab-btn" data-tab="charts">Charts</button>
+    <button class="tab-btn" data-tab="log">Transaction Log</button>
+  </div>
+
+  <!-- ══ TAB: OVERVIEW ══ -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="grid-2">
+
+      <!-- Left: Form (Change 1: Budget field removed) -->
+      <div class="card">
+        <div class="card-title">Add Expense</div>
+
+        <div class="form-row">
+          <label>Description</label>
+          <input id="descInput" type="text" placeholder="e.g. Lunch, Bus fare…" />
+        </div>
+
+        <div class="form-row">
+          <label>Amount (₹)</label>
+          <input id="amountInput" type="number" placeholder="0.00" min="1" step="0.01" />
+        </div>
+
+        <div class="form-row">
+          <label>Category</label>
+          <select id="categorySelect">
+            <option value="Food">🍔  Food</option>
+            <option value="Transport">🚌  Transport</option>
+            <option value="Academics">📚  Academics</option>
+            <option value="Entertainment">🎮  Entertainment</option>
+            <option value="Social">🎉  Social</option>
+            <option value="Other">📦  Other</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" onclick="addExpense()">Add Expense</button>
+      </div>
+
+      <!-- Right: Wallet + Quick Pie -->
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+        <div class="wallet-card" id="walletCard">
+          <div class="wallet-bank">🏦 Bank Account</div>
+          <div class="wallet-acct" id="walletAcctDisplay">** ** **** ****</div>
+          <div class="wallet-label">Available Balance</div>
+          <div class="wallet-balance" id="walletBalDisplay">—</div>
+          <!-- Change 2 & 3: Add Funds + Edit buttons -->
+          <div class="wallet-actions">
+            <button class="btn btn-wallet" onclick="openWalletModal()">⚙ Edit Account</button>
+            <button class="btn btn-add-funds" onclick="openAddFundsModal()">＋ Add Funds</button>
+          </div>
+        </div>
+
+        <div class="card" style="flex:1">
+          <div class="card-title">Spending by Category</div>
+          <div class="chart-container" style="height:180px;">
+            <p class="chart-no-data" id="pieNoData">No expenses yet</p>
+            <canvas id="pieChart"></canvas>
+          </div>
+          <div class="legend" id="pieLegend"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Change 4: Budget Progress by Category – shows actual spend only, no budget division -->
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-title">Spending by Category</div>
+      <div class="budget-bars" id="budgetBars"></div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: CATEGORIES (Changes 6) ══ -->
+  <div class="tab-panel" id="tab-categories">
+    <div class="grid-2">
+      <div>
+        <div class="cat-section-header"><span class="cat-dot" style="background:#3b82f6"></span>Daily</div>
+        <div id="catGroup-daily"></div>
+      </div>
+      <div>
+        <!-- Change 6: Social & Entertainment moved to Monthly, Academics to Yearly -->
+        <div class="cat-section-header"><span class="cat-dot" style="background:#8b5cf6"></span>Monthly</div>
+        <div id="catGroup-monthly"></div>
+      </div>
+      <div>
+        <div class="cat-section-header"><span class="cat-dot" style="background:#f59e0b"></span>Yearly</div>
+        <div id="catGroup-yearly"></div>
+      </div>
+      <div>
+        <div class="cat-section-header"><span class="cat-dot" style="background:#6b7280"></span>One-Time / Other</div>
+        <div id="catGroup-onetime"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: CHARTS (Change 7: Pie chart removed, bar chart full-width with new logic) ══ -->
+  <div class="tab-panel" id="tab-charts">
+    <div class="card">
+      <div class="card-title">
+        Spending Over Time
+        <div class="chart-tabs">
+          <button class="chart-tab active" data-range="daily">Daily</button>
+          <button class="chart-tab" data-range="weekly">Weekly</button>
+          <button class="chart-tab" data-range="monthly">Monthly</button>
+        </div>
+      </div>
+      <div class="chart-container" style="height:360px;">
+        <p class="chart-no-data" id="barNoData">No expenses yet</p>
+        <canvas id="barChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: LOG ══ -->
+  <div class="tab-panel" id="tab-log">
+    <div class="card">
+      <div class="card-title">
+        Transaction Log
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <!-- Change 8: "Export CSV" renamed to "Download Excel file" -->
+          <button class="btn btn-secondary btn-sm" onclick="exportExcel()">⬇ Download Excel file</button>
+          <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+        </div>
+      </div>
+      <div class="log-controls">
+        <label style="margin:0;font-size:.75rem;white-space:nowrap;">From</label>
+        <input type="date" id="filterFrom" style="margin:0;" onchange="renderLog()"/>
+        <label style="margin:0;font-size:.75rem;white-space:nowrap;">To</label>
+        <input type="date" id="filterTo" style="margin:0;" onchange="renderLog()"/>
+        <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear</button>
+      </div>
+      <ul class="log-list" id="expenseLog"></ul>
+    </div>
+  </div>
+
+</div><!-- /.page -->
+
+<!-- ── WALLET MODAL (Change 3: Edit balance freely, can set to 0) ── -->
+<div class="modal-overlay" id="walletModal">
+  <div class="modal">
+    <div class="modal-title">🏦 Wallet Account Setup</div>
+    <div class="form-row">
+      <label>Account Number</label>
+      <input id="walletAcctInput" type="text" placeholder="e.g. 1234567890123456" maxlength="20"/>
+    </div>
+    <div class="form-row">
+      <label>Account Balance (₹) <span style="font-size:.7rem;color:var(--muted);font-weight:400;">— can be set to 0</span></label>
+      <input id="walletBalInput" type="number" placeholder="e.g. 50000" min="0" step="0.01"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeWalletModal()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;" onclick="saveWallet()">Save</button>
+    </div>
   </div>
 </div>
 
-<!-- ── Days Until Broke Prediction Banner ── -->
-<div class="prediction-wrap">
-  <div id="prediction" class="state-empty">
-    <span class="pred-icon">🔮</span>
-    <div class="pred-text">
-      <strong>No data available</strong>
-      <span class="pred-meta">Add expenses to see your spending forecast</span>
+<!-- ── ADD FUNDS MODAL (Change 2: Positive transaction to bank account) ── -->
+<div class="modal-overlay" id="addFundsModal">
+  <div class="modal">
+    <div class="modal-title">💰 Add Funds to Account</div>
+    <div class="form-row">
+      <label>Description</label>
+      <input id="fundsDesc" type="text" placeholder="e.g. Pocket money, Scholarship…"/>
+    </div>
+    <div class="form-row">
+      <label>Amount (₹)</label>
+      <input id="fundsAmt" type="number" placeholder="0.00" min="0.01" step="0.01"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeAddFundsModal()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;" onclick="addFunds()">Add Funds</button>
     </div>
   </div>
 </div>
 
-<div class="layout">
-
-  <!-- ── Left: Add Expense Form ── -->
-  <div class="card">
-    <h2>Set Budget &amp; Add Expense</h2>
-
-    <!-- Budget setter -->
-    <label for="budgetInput">Monthly Budget (₹)</label>
-    <div class="budget-row">
-      <input id="budgetInput" type="number" placeholder="e.g. 5000" min="0" />
-      <button onclick="setBudget()">Set</button>
+<!-- ── ADD EXPENSE MODAL (FAB) ── -->
+<div class="modal-overlay" id="fabModal">
+  <div class="modal">
+    <div class="modal-title">➕ Quick Add Expense</div>
+    <div class="form-row">
+      <label>Description</label>
+      <input id="fabDesc" type="text" placeholder="e.g. Canteen lunch"/>
     </div>
-
-    <!-- Expense fields -->
-    <label for="descInput">Description</label>
-    <input id="descInput" type="text" placeholder="e.g. Lunch, Bus fare…" />
-
-    <label for="amountInput">Amount (₹)</label>
-    <input id="amountInput" type="number" placeholder="0.00" min="1" />
-
-    <label for="categorySelect">Category</label>
-    <select id="categorySelect">
-      <option value="Food">🍔  Food</option>
-      <option value="Transport">🚌  Transport</option>
-      <option value="Academics">📚  Academics</option>
-      <option value="Entertainment">🎮  Entertainment</option>
-    </select>
-
-    <button id="addBtn" onclick="addExpense()">Add Expense</button>
-  </div>
-
-  <!-- ── Right: Pie Chart ── -->
-  <div class="card">
-    <h2>Spending by Category</h2>
-    <div class="chart-wrap">
-      <p id="noDataMsg">No expenses yet — add one!</p>
-      <!-- ✅ Chart.js renders into this canvas -->
-      <canvas id="expenseChart"></canvas>
+    <div class="form-row">
+      <label>Amount (₹)</label>
+      <input id="fabAmt" type="number" placeholder="0.00" min="1" step="0.01"/>
     </div>
-
-    <!-- Custom legend with live ₹ totals -->
-    <div class="legend">
-      <div class="legend-item">
-        <span class="legend-dot" style="background:var(--food)"></span>
-        <span class="cat">Food</span>
-        <span class="amt" id="leg-Food">₹0</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:var(--transport)"></span>
-        <span class="cat">Transport</span>
-        <span class="amt" id="leg-Transport">₹0</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:var(--academics)"></span>
-        <span class="cat">Academics</span>
-        <span class="amt" id="leg-Academics">₹0</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:var(--entertain)"></span>
-        <span class="cat">Entertainment</span>
-        <span class="amt" id="leg-Entertainment">₹0</span>
-      </div>
+    <div class="form-row">
+      <label>Category</label>
+      <select id="fabCat">
+        <option value="Food">🍔  Food</option>
+        <option value="Transport">🚌  Transport</option>
+        <option value="Academics">📚  Academics</option>
+        <option value="Entertainment">🎮  Entertainment</option>
+        <option value="Social">🎉  Social</option>
+        <option value="Other">📦  Other</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeFabModal()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;" onclick="addFromFab()">Add</button>
     </div>
   </div>
+</div>
 
-  <!-- ── Full-width Expense Log ── -->
-  <div class="card log">
-    <div class="log-header">
-      <h2>Expense Log</h2>
-      <button class="clear-btn" onclick="clearAll()">Clear All</button>
-    </div>
-    <ul class="log-list" id="expenseLog"></ul>
-  </div>
-
-</div><!-- /.layout -->
-
-</div><!-- /.page-body -->
+<!-- ── FAB BUTTON ── -->
+<button class="fab" onclick="openFabModal()" title="Quick Add">+</button>
 
 <script>
-  // ═══════════════════════════════════════════════════
-  //  DATA LAYER — expenses array + localStorage
-  // ═══════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
+//  DATA LAYER
+// ════════════════════════════════════════════════════════════════
 
-  // Load existing expenses from localStorage (or start empty)
-  let expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+// transactions: { id, type: "expense"|"credit", desc, amount, category? }
+let transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+let wallet       = JSON.parse(localStorage.getItem("wallet")       || "null");
 
-  // Load saved budget (default 0)
-  let budget = parseFloat(localStorage.getItem("budget") || "0");
-
-
-  // ═══════════════════════════════════════════════════
-  //  CONSTANTS — categories & colours
-  // ═══════════════════════════════════════════════════
-
-  // Must match the <select> option values exactly
-  const CATEGORIES = ["Food", "Transport", "Academics", "Entertainment"];
-
-  // One colour per category, same order as CATEGORIES
-  const CATEGORY_COLORS = ["#dc2626", "#d97706", "#0891b2", "#7c3aed"];
-
-
-  // ═══════════════════════════════════════════════════
-  //  CHART SETUP — initialise once on page load
-  // ═══════════════════════════════════════════════════
-
-  const ctx = document.getElementById("expenseChart").getContext("2d");
-
-  // Build chart with current data (may already have saved expenses)
-  const expenseChart = new Chart(ctx, {
-    type: "pie",
-
-    data: {
-      labels: CATEGORIES,
-      datasets: [{
-        data: getCategoryTotals(),       // initial data from localStorage
-        backgroundColor: CATEGORY_COLORS,
-        borderColor: "#ffffff",          // white gap between slices
-        borderWidth: 3,
-        hoverOffset: 12,
-      }]
-    },
-
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 500, easing: "easeInOutQuart" },
-
-      plugins: {
-        legend: { display: false },      // we render our own legend below
-
-        tooltip: {
-          callbacks: {
-            // Tooltip: "₹120.00  (34.5%)"
-            label: function(context) {
-              const data  = context.dataset.data;
-              const total = data.reduce(function(a, b) { return a + b; }, 0);
-              const value = context.parsed;
-              const pct   = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
-              return "  ₹" + value.toFixed(2) + "  (" + pct + "%)";
-            }
-          }
-        }
-      }
-    }
-  });
-
-  // Hide canvas on first load if no data yet
-  syncChartVisibility();
-
-
-  // ═══════════════════════════════════════════════════
-  //  getCategoryTotals()
-  //  Loops over expenses[] and sums amounts per category.
-  //  Returns an array aligned with CATEGORIES order.
-  // ═══════════════════════════════════════════════════
-  function getCategoryTotals() {
-    // Start every category at zero
-    const totals = { Food: 0, Transport: 0, Academics: 0, Entertainment: 0 };
-
-    expenses.forEach(function(exp) {
-      if (totals[exp.category] !== undefined) {
-        totals[exp.category] += exp.amount;
-      }
-    });
-
-    // Return as array matching CATEGORIES index order
-    return CATEGORIES.map(function(cat) { return totals[cat]; });
+// Back-compat: migrate old "expenses" key
+(function migrate() {
+  const old = localStorage.getItem("expenses");
+  if (old && !localStorage.getItem("transactions")) {
+    const arr = JSON.parse(old || "[]");
+    transactions = arr.map(e => ({ ...e, type: "expense" }));
+    save();
   }
+})();
 
+function save() {
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+}
 
-  // ═══════════════════════════════════════════════════
-  //  updateChart()
-  //  Recalculates totals and redraws the pie chart.
-  //  Also refreshes the legend amounts below the chart.
-  //  Call this every time expenses[] changes.
-  // ═══════════════════════════════════════════════════
-  function updateChart() {
-    // Push fresh totals into the chart dataset
-    expenseChart.data.datasets[0].data = getCategoryTotals();
-    expenseChart.update();               // re-render with smooth animation
+const CATEGORIES = ["Food", "Transport", "Academics", "Entertainment", "Social", "Other"];
+const CAT_COLORS = {
+  Food: "#ef4444", Transport: "#f59e0b", Academics: "#06b6d4",
+  Entertainment: "#8b5cf6", Social: "#ec4899", Other: "#64748b"
+};
 
-    syncChartVisibility();
+// Change 6: Updated category groups
+// Social & Entertainment → monthly, Academics → yearly
+const CAT_GROUPS = {
+  Food: "daily", Transport: "daily",
+  Entertainment: "monthly", Social: "monthly",
+  Academics: "yearly",
+  Other: "onetime"
+};
 
-    // Refresh the custom legend amounts
-    const totals = getCategoryTotals();
-    CATEGORIES.forEach(function(cat, i) {
-      document.getElementById("leg-" + cat).textContent = "₹" + totals[i].toFixed(0);
-    });
-  }
+let pieChartInst = null;
+let barChartInst = null;
+let barRange     = "daily";
 
-  // Show canvas only when there is real data; show placeholder otherwise
-  function syncChartVisibility() {
-    const hasData = expenses.length > 0;
-    document.getElementById("noDataMsg").style.display = hasData ? "none"  : "block";
-    ctx.canvas.style.display                           = hasData ? "block" : "none";
-  }
+// ════════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════════
 
+function fmt(n) {
+  return "₹" + Number(n).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
-  // ═══════════════════════════════════════════════════
-  //  updateStats()
-  //  Refreshes the three stat cards at the top.
-  //  Call alongside updateChart() whenever data changes.
-  // ═══════════════════════════════════════════════════
-  function updateStats() {
-    const totalSpent = expenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
-    const remaining  = budget - totalSpent;
+function fmtDate(ts) {
+  const d  = new Date(ts);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${yy} ${hh}:${mi}`;
+}
 
-    document.getElementById("statBudget").textContent  = "₹" + budget.toFixed(2);
-    document.getElementById("statSpent").textContent   = "₹" + totalSpent.toFixed(2);
+function escapeHTML(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
 
+function getExpenses()     { return transactions.filter(t => t.type === "expense"); }
+function getCredits()      { return transactions.filter(t => t.type === "credit");  }
+function getTotalSpent()   { return getExpenses().reduce((s,e) => s + e.amount, 0); }
+function getTotalCredits() { return getCredits().reduce((s,c) => s + c.amount, 0); }
+
+function getCategoryTotals() {
+  const t = {};
+  CATEGORIES.forEach(c => t[c] = 0);
+  getExpenses().forEach(e => { if (t[e.category] !== undefined) t[e.category] += e.amount; });
+  return t;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  STATS
+// ════════════════════════════════════════════════════════════════
+
+function updateStats() {
+  const totalSpent = getTotalSpent();
+
+  document.getElementById("statSpent").textContent = fmt(totalSpent);
+
+  if (wallet) {
+    const effective = wallet.balance + getTotalCredits() - totalSpent;
     const balEl = document.getElementById("statBalance");
-    balEl.textContent = "₹" + Math.abs(remaining).toFixed(2) + (remaining < 0 ? " over" : "");
-    balEl.style.color = remaining < 0 ? "var(--danger)" : "var(--academics)";
+    balEl.textContent  = fmt(Math.abs(effective)) + (effective < 0 ? " over" : "");
+    balEl.style.color  = effective < 0 ? "var(--danger)" : "var(--success)";
+  } else {
+    document.getElementById("statBalance").textContent = "—";
+    document.getElementById("statBalance").style.color = "var(--muted)";
   }
 
+  updateWalletDisplay();
+  updatePrediction(totalSpent);
+  renderBudgetBars();
+}
 
-  // ═══════════════════════════════════════════════════
-  //  setBudget()
-  //  Reads budget input, saves to localStorage, refreshes UI.
-  // ═══════════════════════════════════════════════════
-  function setBudget() {
-    const val = parseFloat(document.getElementById("budgetInput").value);
-    if (!val || val <= 0) { alert("Please enter a valid budget amount."); return; }
+// ════════════════════════════════════════════════════════════════
+//  WALLET
+// ════════════════════════════════════════════════════════════════
 
-    budget = val;
-    localStorage.setItem("budget", budget);        // persist budget
-    document.getElementById("budgetInput").value = "";
-    updateStats();
-    updatePrediction(); // budget change affects days left
+function openWalletModal() {
+  if (wallet) {
+    document.getElementById("walletAcctInput").value = wallet.acct;
+    document.getElementById("walletBalInput").value  = wallet.balance;
+  }
+  document.getElementById("walletModal").classList.add("open");
+}
+function closeWalletModal() { document.getElementById("walletModal").classList.remove("open"); }
+
+function saveWallet() {
+  const acct = (document.getElementById("walletAcctInput").value || "").replace(/\s/g,"");
+  const balRaw = document.getElementById("walletBalInput").value;
+  const bal  = parseFloat(balRaw);
+
+  if (!acct || acct.length < 4)     { alert("Enter a valid account number (at least 4 digits)."); return; }
+  if (balRaw === "" || isNaN(bal) || bal < 0) { alert("Enter a valid balance (0 or more)."); return; }
+
+  wallet = { acct, balance: bal };
+  localStorage.setItem("wallet", JSON.stringify(wallet));
+  closeWalletModal();
+  updateAll();
+}
+
+function updateWalletDisplay() {
+  const totalSpent   = getTotalSpent();
+  const totalCredits = getTotalCredits();
+
+  if (!wallet) {
+    document.getElementById("walletBalDisplay").textContent  = "—";
+    document.getElementById("walletAcctDisplay").textContent = "** ** **** ****";
+    document.getElementById("statWallet").textContent        = "—";
+    document.getElementById("statWalletAcct").textContent    = "Click to setup";
+    return;
   }
 
+  const effective = wallet.balance + totalCredits - totalSpent;
+  const masked    = "** ** **** " + wallet.acct.slice(-4);
 
-  // ═══════════════════════════════════════════════════
-  //  addExpense()
-  //  Reads form inputs → pushes to expenses[] →
-  //  saves to localStorage → updates chart & stats → logs entry.
-  // ═══════════════════════════════════════════════════
-  function addExpense() {
-    const desc     = document.getElementById("descInput").value.trim();
-    const amount   = parseFloat(document.getElementById("amountInput").value);
-    const category = document.getElementById("categorySelect").value;
+  document.getElementById("walletBalDisplay").textContent  = fmt(effective);
+  document.getElementById("walletAcctDisplay").textContent = masked;
+  document.getElementById("statWallet").textContent        = fmt(effective);
+  document.getElementById("statWalletAcct").textContent    = masked;
+}
 
-    // Basic validation
-    if (!desc)               { alert("Please enter a description."); return; }
-    if (!amount || amount <= 0) { alert("Please enter a valid amount."); return; }
+// Change 2: Add Funds — shows as positive (green) in transaction log
+function openAddFundsModal() {
+  if (!wallet) { alert("Please set up your wallet account first."); openWalletModal(); return; }
+  document.getElementById("addFundsModal").classList.add("open");
+}
+function closeAddFundsModal() { document.getElementById("addFundsModal").classList.remove("open"); }
 
-    // Create expense object and add to array
-    const expense = { id: Date.now(), desc, amount, category };
-    expenses.push(expense);
+function addFunds() {
+  const desc   = (document.getElementById("fundsDesc").value || "").trim();
+  const amount = parseFloat(document.getElementById("fundsAmt").value);
+  if (!desc)                { alert("Enter a description."); return; }
+  if (!amount || amount<=0) { alert("Enter a valid amount."); return; }
 
-    // ✅ Persist to localStorage
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+  transactions.push({ id: Date.now(), type: "credit", desc, amount });
+  save();
+  document.getElementById("fundsDesc").value = "";
+  document.getElementById("fundsAmt").value  = "";
+  closeAddFundsModal();
+  updateAll();
+}
 
-    // ✅ Refresh chart with new data
-    updateChart();
+// ════════════════════════════════════════════════════════════════
+//  PREDICTION BANNER
+// ════════════════════════════════════════════════════════════════
 
-    // ✅ Refresh stat cards
-    updateStats();
+function updatePrediction(totalSpent) {
+  const el = document.getElementById("prediction");
+  if (!el) return;
 
-    // ✅ Refresh days-until-broke prediction
-    updatePrediction();
+  const expenses = getExpenses();
 
-    // Add row to the visual log
-    prependLogItem(expense);
+  // --- NEW LOGIC: Filter out "Other" and recalculate total ---
+  const filteredExpenses = expenses.filter(exp => exp.category !== "Other");
+  const filteredTotal = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  // -----------------------------------------------------------
 
-    // Clear inputs
-    document.getElementById("descInput").value  = "";
-    document.getElementById("amountInput").value = "";
+  function set(state, icon, head, meta) {
+    el.className = "state-" + state;
+    el.innerHTML = `<span class="pred-icon">${icon}</span>
+      <div class="pred-text"><strong>${head}</strong>
+      <span class="pred-meta">${meta}</span></div>`;
   }
 
-
-  // ═══════════════════════════════════════════════════
-  //  deleteExpense(id)
-  //  Removes one entry by id, syncs localStorage & UI.
-  // ═══════════════════════════════════════════════════
-  function deleteExpense(id) {
-    expenses = expenses.filter(function(e) { return e.id !== id; });
-
-    // ✅ Persist updated array
-    localStorage.setItem("expenses", JSON.stringify(expenses));
-
-    // Remove list item from DOM
-    const li = document.getElementById("item-" + id);
-    if (li) li.remove();
-
-    // Show placeholder if log is now empty
-    if (expenses.length === 0) renderLog();
-
-    // ✅ Keep chart and stats in sync
-    updateChart();
-    updateStats();
-    updatePrediction();
+  // Use filteredExpenses and filteredTotal for the logic below
+  if (filteredExpenses.length === 0 || filteredTotal <= 0) {
+    set("empty","🔮","No data available","Add non-other expenses to see your forecast"); 
+    return;
   }
 
-
-  // ═══════════════════════════════════════════════════
-  //  clearAll()
-  //  Wipes expenses array, localStorage, and resets UI.
-  // ═══════════════════════════════════════════════════
-  function clearAll() {
-    if (!confirm("Clear all expenses? This cannot be undone.")) return;
-
-    expenses = [];
-    localStorage.removeItem("expenses");
-
-    renderLog();        // re-render empty log
-    updateChart();      // reset chart to zeros
-    updateStats();      // reset stat cards
-    updatePrediction(); // reset forecast banner
-  }
-
-
-  // ═══════════════════════════════════════════════════
-  //  renderLog()
-  //  Rebuilds the full log list from expenses[].
-  //  Used on page load to restore persisted entries.
-  // ═══════════════════════════════════════════════════
-  function renderLog() {
-    const ul = document.getElementById("expenseLog");
-    ul.innerHTML = "";
-
-    if (expenses.length === 0) {
-      ul.innerHTML = '<li class="empty-log">No expenses recorded yet.</li>';
+  if (wallet) {
+    // Prediction now uses filteredTotal instead of the original totalSpent
+    const effective = wallet.balance + getTotalCredits() - filteredTotal;
+    
+    if (effective <= 0) {
+      set("danger","💸","Wallet balance exhausted!","Consider adding funds or reviewing spending"); 
       return;
     }
 
-    // Newest first
-    const reversed = expenses.slice().reverse();
-    reversed.forEach(function(exp) { appendLogItem(ul, exp); });
+    const startDate  = new Date(filteredExpenses[0].id);
+    const daysPassed = Math.max(1, Math.floor((Date.now() - startDate) / 86400000));
+    const dailyAvg   = filteredTotal / daysPassed;
+
+    if (dailyAvg <= 0) { 
+      set("empty","🔮","No data yet",""); 
+      return; 
+    }
+
+    const daysLeft = Math.floor(effective / dailyAvg);
+    const state    = daysLeft <= 3 ? "danger" : daysLeft <= 7 ? "warn" : "safe";
+    const icon     = { safe:"✅", warn:"⚠️", danger:"🚨" }[state];
+
+    set(state, icon, `Your money will last ~${daysLeft} days`,
+      `Avg ${fmt(dailyAvg)}/day (excl. Other) · tracked over ${daysPassed} day${daysPassed===1?"":"s"}`);
+  } else {
+    set("empty","💡","Set up your wallet","Link your bank account to see spending forecasts");
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  BUDGET BARS (Change 4: show actual spend per category, no budget division)
+// ════════════════════════════════════════════════════════════════
+
+function renderBudgetBars() {
+  const wrap = document.getElementById("budgetBars");
+  if (!wrap) return;
+
+  const totals   = getCategoryTotals();
+  const maxSpend = Math.max(...Object.values(totals), 1);
+
+  wrap.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    const amt   = totals[cat];
+    const pct   = Math.min(100, (amt / maxSpend) * 100);
+    const color = CAT_COLORS[cat];
+
+    const row = document.createElement("div");
+    row.className = "bbar-row";
+    row.innerHTML = `
+      <div class="bbar-header">
+        <span class="bbar-name">
+          <span style="width:7px;height:7px;border-radius:50%;background:${color};display:inline-block;"></span>
+          ${cat}
+        </span>
+        <span class="bbar-vals">${fmt(amt)}</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%;background:${color};"></div>
+      </div>`;
+    wrap.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  PIE CHART (overview only)
+// ════════════════════════════════════════════════════════════════
+
+function renderPie() {
+  const canvas = document.getElementById("pieChart");
+  const noData = document.getElementById("pieNoData");
+  const legend = document.getElementById("pieLegend");
+  if (!canvas) return;
+
+  const totals  = getCategoryTotals();
+  const vals    = CATEGORIES.map(c => totals[c]);
+  const hasData = vals.some(v => v > 0);
+
+  if (noData) noData.style.display = hasData ? "none" : "flex";
+  canvas.style.display = hasData ? "block" : "none";
+  if (!hasData) { if (pieChartInst) { pieChartInst.destroy(); pieChartInst = null; } return; }
+
+  const chartData = {
+    labels: CATEGORIES,
+    datasets: [{ data: vals, backgroundColor: CATEGORIES.map(c => CAT_COLORS[c]), borderColor:"#fff", borderWidth:2, hoverOffset:8 }]
+  };
+
+  if (!pieChartInst) {
+    pieChartInst = new Chart(canvas.getContext("2d"), {
+      type: "pie", data: chartData,
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => { const t=ctx.dataset.data.reduce((a,b)=>a+b,0); return ` ${fmt(ctx.parsed)} (${((ctx.parsed/t)*100).toFixed(1)}%)`; } } }
+        }
+      }
+    });
+  } else { pieChartInst.data = chartData; pieChartInst.update(); }
+
+  if (legend) {
+    legend.innerHTML = CATEGORIES.map((c,i) => `
+      <div class="legend-item">
+        <span class="legend-dot" style="background:${CAT_COLORS[c]}"></span>
+        <span class="legend-cat">${c}</span>
+        <span class="legend-amt">${vals[i]>0?fmt(vals[i]):"₹0"}</span>
+      </div>`).join("");
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  BAR CHART (Change 7: new logic for daily/weekly/monthly)
+// ════════════════════════════════════════════════════════════════
+
+function renderBarChart() {
+  const canvas = document.getElementById("barChart");
+  const noData = document.getElementById("barNoData");
+  if (!canvas) return;
+
+  const expenses = getExpenses();
+
+  if (expenses.length === 0) {
+    if (noData) noData.style.display = "flex";
+    canvas.style.display = "none";
+    if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+    return;
+  }
+  if (noData) noData.style.display = "none";
+  canvas.style.display = "block";
+
+  let labels = [];
+  let groups = {};
+
+  if (barRange === "daily") {
+    // Daily: today's expenses split into separate vertical bars per category
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    labels = CATEGORIES;
+    const catTotals = getCategoryTotals();
+    // Each category is its own dataset of 1 bar
+    const datasets = CATEGORIES.map(cat => ({
+      label: cat,
+      data: CATEGORIES.map(c => c === cat ? (catTotals[c] || 0) : 0),
+      backgroundColor: CAT_COLORS[cat] + "dd",
+      borderRadius: 5,
+      borderSkipped: false
+    }));
+
+    if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+    barChartInst = new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+        scales: {
+          x: { stacked: false, grid: { display: false }, ticks: { font: { size: 11, family: "'DM Sans'" } } },
+          y: { stacked: false, ticks: { callback: v => "₹"+v, font: { size: 11 } }, grid: { color: "#f0f2f8" } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } }
+        }
+      }
+    });
+    return;
   }
 
-  // Prepend a single new item (used on addExpense for animation)
-  function prependLogItem(exp) {
-    const ul = document.getElementById("expenseLog");
-    // Remove empty placeholder if present
-    const empty = ul.querySelector(".empty-log");
-    if (empty) empty.remove();
+  if (barRange === "weekly") {
+    // Weekly: always show Mon–Sun of current week; each day = stacked categories
+    const today  = new Date();
+    const dow    = (today.getDay() + 6) % 7; // 0=Mon
+    const monday = new Date(today); monday.setDate(today.getDate() - dow); monday.setHours(0,0,0,0);
+    const dayLabels = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    labels = dayLabels;
 
-    const li = buildLogItem(exp);
-    ul.prepend(li);
+    // Build day buckets
+    const buckets = Array.from({length:7}, () => { const o={}; CATEGORIES.forEach(c=>o[c]=0); return o; });
+    expenses.forEach(exp => {
+      const d = new Date(exp.id); d.setHours(0,0,0,0);
+      const diff = Math.round((d - monday) / 86400000);
+      if (diff >= 0 && diff < 7) buckets[diff][exp.category] = (buckets[diff][exp.category]||0) + exp.amount;
+    });
+
+    const datasets = CATEGORIES.map(cat => ({
+      label: cat,
+      data: buckets.map(b => b[cat]||0),
+      backgroundColor: CAT_COLORS[cat] + "dd",
+      borderRadius: 4, borderSkipped: false, stack: "main"
+    }));
+
+    if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+    barChartInst = new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: { stacked: true, ticks: { callback: v => "₹"+v, font: { size: 11 } }, grid: { color: "#f0f2f8" } }
+        },
+        plugins: {
+          legend: { position:"bottom", labels: { usePointStyle:true, font:{ size:11 }, boxWidth:8 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } }
+        }
+      }
+    });
+    return;
   }
 
-  // Append during full re-render
-  function appendLogItem(ul, exp) {
-    ul.appendChild(buildLogItem(exp));
-  }
+  if (barRange === "monthly") {
+    // Monthly: all 12 months, stacked categories
+    const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    labels = MONTHS;
+    const buckets = Array.from({length:12}, () => { const o={}; CATEGORIES.forEach(c=>o[c]=0); return o; });
+    expenses.forEach(exp => {
+      const m = new Date(exp.id).getMonth();
+      buckets[m][exp.category] = (buckets[m][exp.category]||0) + exp.amount;
+    });
 
-  // Build a single <li> element for a given expense
-  function buildLogItem(exp) {
+    const datasets = CATEGORIES.map(cat => ({
+      label: cat,
+      data: buckets.map(b => b[cat]||0),
+      backgroundColor: CAT_COLORS[cat] + "dd",
+      borderRadius: 4, borderSkipped: false, stack: "main"
+    }));
+
+    if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+    barChartInst = new Chart(canvas.getContext("2d"), {
+      type: "bar",
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 400 },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+          y: { stacked: true, ticks: { callback: v => "₹"+v, font: { size: 11 } }, grid: { color: "#f0f2f8" } }
+        },
+        plugins: {
+          legend: { position:"bottom", labels: { usePointStyle:true, font:{ size:11 }, boxWidth:8 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` } }
+        }
+      }
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CATEGORY TAB
+// ════════════════════════════════════════════════════════════════
+
+function renderCategoryTab() {
+  const groups = { daily:{}, monthly:{}, yearly:{}, onetime:{} };
+  CATEGORIES.forEach(cat => {
+    const g = CAT_GROUPS[cat];
+    groups[g][cat] = { total:0, count:0, recent:[] };
+  });
+
+  getExpenses().forEach(exp => {
+    const g = CAT_GROUPS[exp.category];
+    if (!groups[g] || !groups[g][exp.category]) return;
+    groups[g][exp.category].total += exp.amount;
+    groups[g][exp.category].count++;
+    groups[g][exp.category].recent.push(exp);
+  });
+
+  ["daily","monthly","yearly","onetime"].forEach(gKey => {
+    const wrap = document.getElementById("catGroup-" + gKey);
+    if (!wrap) return;
+    wrap.innerHTML = "";
+    Object.entries(groups[gKey]).forEach(([cat, data]) => {
+      const recent3 = data.recent.slice(-3).reverse();
+      const card = document.createElement("div");
+      card.className = "cat-card";
+      card.innerHTML = `
+        <div class="cat-card-top">
+          <div class="cat-name">
+            <span style="width:9px;height:9px;border-radius:50%;background:${CAT_COLORS[cat]};display:inline-block;flex-shrink:0;"></span>
+            ${cat}
+          </div>
+          <div class="cat-meta">
+            <div class="cat-total">${fmt(data.total)}</div>
+            <div class="cat-count">${data.count} expense${data.count!==1?"s":""}</div>
+          </div>
+        </div>
+        ${data.total>0?`<div class="cat-recent">${recent3.map(e=>`
+          <div class="mini-tx">
+            <span class="mini-tx-desc">${escapeHTML(e.desc||"Expense")}</span>
+            <span class="mini-tx-amt">${fmt(e.amount)}</span>
+            <span class="mini-tx-date">${fmtDate(e.id)}</span>
+          </div>`).join("")}</div>`:""}`;
+      wrap.appendChild(card);
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  TRANSACTION LOG (Change 2: credits green, expenses red)
+// ════════════════════════════════════════════════════════════════
+
+function renderLog() {
+  const ul = document.getElementById("expenseLog");
+  if (!ul) return;
+
+  const from = document.getElementById("filterFrom")?.value;
+  const to   = document.getElementById("filterTo")?.value;
+
+  let filtered = [...transactions].reverse();
+  if (from) filtered = filtered.filter(t => new Date(t.id) >= new Date(from));
+  if (to)   filtered = filtered.filter(t => new Date(t.id) <= new Date(to + "T23:59:59"));
+
+  ul.innerHTML = filtered.length === 0 ? `<li class="empty-log">No transactions found.</li>` : "";
+
+  filtered.forEach(tx => {
+    const isCredit = tx.type === "credit";
     const li = document.createElement("li");
-    li.className = "log-item";
-    li.id = "item-" + exp.id;
+    li.className = "log-item " + (isCredit ? "log-credit" : "log-debit");
+    li.id = "item-" + tx.id;
+    const tagHtml = isCredit
+      ? `<span class="log-tag tag-Credit">Credit</span>`
+      : `<span class="log-tag tag-${tx.category}">${tx.category}</span>`;
+    li.innerHTML = `
+      ${tagHtml}
+      <span class="log-desc">${escapeHTML(tx.desc||"Transaction")}</span>
+      <span class="log-date">${fmtDate(tx.id)}</span>
+      <span class="log-amt ${isCredit?"amt-credit":"amt-debit"}">${isCredit?"+":"−"}${fmt(tx.amount)}</span>
+      <button class="log-del" onclick="deleteTransaction(${tx.id})" title="Delete">✕</button>`;
+    ul.appendChild(li);
+  });
+}
 
-    li.innerHTML =
-      '<span class="tag tag-' + exp.category + '">' + exp.category + '</span>' +
-      '<span class="log-desc">' + escapeHTML(exp.desc) + '</span>' +
-      '<span class="log-amt">₹' + exp.amount.toFixed(2) + '</span>' +
-      '<button class="del-btn" onclick="deleteExpense(' + exp.id + ')" title="Delete">×</button>';
+function clearFilters() {
+  document.getElementById("filterFrom").value = "";
+  document.getElementById("filterTo").value   = "";
+  renderLog();
+}
 
-    return li;
-  }
+// ════════════════════════════════════════════════════════════════
+//  ACTIONS
+// ════════════════════════════════════════════════════════════════
 
-  // Simple XSS guard for user-entered text
-  function escapeHTML(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
+function addExpense() {
+  const desc     = document.getElementById("descInput").value.trim();
+  const amount   = parseFloat(document.getElementById("amountInput").value);
+  const category = document.getElementById("categorySelect").value;
+  if (!desc)               { alert("Enter a description."); return; }
+  if (!amount || amount<=0){ alert("Enter a valid amount."); return; }
+  transactions.push({ id:Date.now(), type:"expense", desc, amount, category });
+  save();
+  document.getElementById("descInput").value   = "";
+  document.getElementById("amountInput").value = "";
+  updateAll();
+}
 
+function addFromFab() {
+  const desc     = document.getElementById("fabDesc").value.trim();
+  const amount   = parseFloat(document.getElementById("fabAmt").value);
+  const category = document.getElementById("fabCat").value;
+  if (!desc)               { alert("Enter a description."); return; }
+  if (!amount || amount<=0){ alert("Enter a valid amount."); return; }
+  transactions.push({ id:Date.now(), type:"expense", desc, amount, category });
+  save();
+  document.getElementById("fabDesc").value = "";
+  document.getElementById("fabAmt").value  = "";
+  closeFabModal();
+  updateAll();
+}
 
-  // ═══════════════════════════════════════════════════
-  //  DAYS UNTIL BROKE — Prediction Feature
-  // ═══════════════════════════════════════════════════
+function deleteTransaction(id) {
+  transactions = transactions.filter(t => t.id !== id);
+  save();
+  updateAll();
+}
 
-  // The date tracking began. We use the timestamp of the very first
-  // expense so the average is always honest, even across multiple sessions.
-  // If no expenses exist yet, we fall back to today (handled in the logic).
-  function getTrackingStartDate() {
-    if (expenses.length === 0) return new Date();
+function clearAll() {
+  if (!confirm("Clear all transactions? This cannot be undone.")) return;
+  transactions = []; save(); updateAll();
+}
 
-    // expenses[0] is the oldest — its id is a Date.now() timestamp
-    return new Date(expenses[0].id);
-  }
+// Change 8: Export as Excel (.xlsx via CSV with BOM, or proper XLSX)
+function exportExcel() {
+  if (transactions.length === 0) { alert("No transactions to export."); return; }
+  // Use CSV with .xlsx extension + BOM so Excel opens it correctly
+  const BOM    = "\uFEFF";
+  const header = ["Date","Description","Type","Category","Amount (INR)"];
+  const rows   = transactions.map(t => [
+    `"${fmtDate(t.id)}"`,
+    `"${(t.desc||"Transaction").replace(/"/g,'""')}"`,
+    `"${t.type==="credit"?"Credit":"Expense"}"`,
+    `"${t.category||"—"}"`,
+    (t.type==="credit"?"+":"-") + t.amount.toFixed(2)
+  ].join(","));
+  const csv  = BOM + [header.join(","), ...rows].join("\n");
+  const blob = new Blob([csv], { type: "application/vnd.ms-excel;charset=utf-8;" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = "transactions_" + new Date().toISOString().slice(0,10) + ".xlsx";
+  a.click(); URL.revokeObjectURL(url);
+}
 
-  // ─────────────────────────────────────────────────
-  //  calculateDaysUntilBroke(totalSpent, remaining)
-  //
-  //  Returns an object with:
-  //    { days, dailyAvg, daysPassed, state, headline, meta }
-  //
-  //  state is one of: "empty" | "broke" | "danger" | "warn" | "safe"
-  // ─────────────────────────────────────────────────
-  function calculateDaysUntilBroke(totalSpent, remaining) {
+// ════════════════════════════════════════════════════════════════
+//  FAB & MODALS
+// ════════════════════════════════════════════════════════════════
 
-    // Edge case: no expenses recorded yet
-    if (expenses.length === 0 || totalSpent <= 0) {
-      return {
-        state:    "empty",
-        headline: "No data available",
-        meta:     "Add expenses to see your spending forecast"
-      };
-    }
+function openFabModal()  { document.getElementById("fabModal").classList.add("open"); }
+function closeFabModal() { document.getElementById("fabModal").classList.remove("open"); }
 
-    // Edge case: already over budget
-    if (remaining <= 0) {
-      return {
-        state:    "danger",
-        headline: "You've exceeded your budget!",
-        meta:     "Consider reviewing your spending categories"
-      };
-    }
+["walletModal","addFundsModal","fabModal"].forEach(id => {
+  document.getElementById(id).addEventListener("click", function(e) {
+    if (e.target === this) this.classList.remove("open");
+  });
+});
 
-    // Step 1: How many days have passed since the first expense?
-    const startDate  = getTrackingStartDate();
-    const today      = new Date();
-    const msPerDay   = 1000 * 60 * 60 * 24;
-    // Use Math.max(1, ...) so we never divide by zero on the first day
-    const daysPassed = Math.max(1, Math.floor((today - startDate) / msPerDay));
+// ════════════════════════════════════════════════════════════════
+//  MASTER UPDATE
+// ════════════════════════════════════════════════════════════════
 
-    // Step 2: Daily average spending
-    const dailyAvg = totalSpent / daysPassed;
+function updateAll() {
+  updateStats();
+  renderPie();
+  const activeTab = document.querySelector(".tab-btn.active")?.dataset.tab;
+  if (activeTab === "charts")     renderBarChart();
+  if (activeTab === "categories") renderCategoryTab();
+  if (activeTab === "log")        renderLog();
+}
 
-    // Edge case: dailyAvg is somehow 0 (shouldn't happen, but guard anyway)
-    if (dailyAvg <= 0) {
-      return {
-        state:    "empty",
-        headline: "No data available",
-        meta:     "Could not calculate a daily average yet"
-      };
-    }
+// ════════════════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════════════════
 
-    // Step 3: How many days will the remaining balance last?
-    const daysLeft = Math.floor(remaining / dailyAvg);
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-"+btn.dataset.tab)?.classList.add("active");
+    if (btn.dataset.tab === "charts")     renderBarChart();
+    if (btn.dataset.tab === "categories") renderCategoryTab();
+    if (btn.dataset.tab === "log")        renderLog();
+  });
+});
 
-    // Step 4: Decide urgency state based on days left
-    let state, headline;
+document.querySelectorAll(".chart-tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".chart-tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    barRange = btn.dataset.range;
+    renderBarChart();
+  });
+});
 
-    if (daysLeft === 0) {
-      state    = "danger";
-      headline = "Your balance won't last another day!";
-    } else if (daysLeft <= 3) {
-      state    = "danger";
-      headline = "Your money will last " + daysLeft + " day" + (daysLeft === 1 ? "" : "s");
-    } else if (daysLeft <= 7) {
-      state    = "warn";
-      headline = "Your money will last " + daysLeft + " days";
-    } else {
-      state    = "safe";
-      headline = "Your money will last " + daysLeft + " days";
-    }
+// ════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════
 
-    // Build the meta line: daily average + days tracked
-    const meta =
-      "Avg ₹" + dailyAvg.toFixed(2) + "/day  ·  tracked over " +
-      daysPassed + " day" + (daysPassed === 1 ? "" : "s");
-
-    return { days: daysLeft, dailyAvg, daysPassed, state, headline, meta };
-  }
-
-
-  // ─────────────────────────────────────────────────
-  //  updatePrediction()
-  //
-  //  Recalculates the forecast and updates #prediction in the DOM.
-  //  Call this whenever expenses or budget change.
-  // ─────────────────────────────────────────────────
-  function updatePrediction() {
-
-    // Read current totals from live expenses array
-    const totalSpent = expenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
-    const remaining  = budget - totalSpent;
-
-    // Get the prediction result object
-    const result = calculateDaysUntilBroke(totalSpent, remaining);
-
-    // Pick the right emoji for each state
-    var icon = { empty: "🔮", safe: "✅", warn: "⚠️", danger: "🚨", broke: "💸" }[result.state] || "🔮";
-
-    // Update DOM elements
-    var el = document.getElementById("prediction");
-
-    // Swap state class (removes old one, adds new one)
-    el.className = "state-" + result.state;
-
-    el.innerHTML =
-      '<span class="pred-icon">' + icon + '</span>' +
-      '<div class="pred-text">' +
-        '<strong>' + result.headline + '</strong>' +
-        '<span class="pred-meta">' + (result.meta || "") + '</span>' +
-      '</div>';
-  }
-
-
-
-  (function init() {
-    // Pre-fill budget input if one was saved
-    if (budget > 0) document.getElementById("budgetInput").placeholder = "Current: ₹" + budget;
-
-    renderLog();    // rebuild log from localStorage
-    updateChart();  // sync chart with saved expenses
-    updateStats();  // sync stat cards
-    updatePrediction(); // show forecast from saved data
-  })();
-
-
-  // ── Allow Enter key to submit from amount field ───
-  document.getElementById("amountInput")
-    .addEventListener("keydown", function(e) { if (e.key === "Enter") addExpense(); });
-
+(function init() {
+  updateAll();
+  document.getElementById("amountInput").addEventListener("keydown", e => { if(e.key==="Enter") addExpense(); });
+  document.getElementById("fabAmt").addEventListener("keydown", e => { if(e.key==="Enter") addFromFab(); });
+  document.getElementById("fundsAmt").addEventListener("keydown", e => { if(e.key==="Enter") addFunds(); });
+})();
 </script>
 </body>
 </html>
